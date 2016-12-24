@@ -1,0 +1,11 @@
+{
+  "name": "syncphotos",
+  "version": "0.0.1",
+  "description": "Sync photos between google photos and locally stored photos",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ted Shaffer",
+  "license": "MIT"
+}
