@@ -83,47 +83,82 @@ function fetchAlbum(albumId) {
   });
 }
 
-function parseGooglePhoto(photo) {
-  const id = photo['gphoto:id'][0];
+function parseGooglePhoto(albumId, photo) {
+  const photoId = photo['gphoto:id'][0];
   const name = photo.title[0]._;
-  const timestamp = photo['exif:tags'][0]['exif:time'];
+  const timestamp = photo['exif:tags'][0]['exif:time'][0];
+  const size = photo['gphoto:size'][0];
+
+  let dateTime = new Date();
+  let ts = Number(timestamp);
+  dateTime.setTime(ts);
+  // const dateTime = new Date().setTime(Number(timestamp));
+
   return {
-    id,
+    albumId,
+    photoId,
     name,
-    timestamp
+    size,
+    timestamp,
+    dateTime
   };
 }
 
 function fetchGooglePhotos() {
 
-  console.log('fetchAlbums');
-  fetchAlbums().then((albumsResponse) => {
+  let shafferPhotos = {};
 
-    console.log('albums successfully retrieved');
+  console.log('fetchGooglePhotos');
 
-    // get albumId's for the albums that represent all our google photo's
-    // there is generally one album per year
-    const googlePhotoAlbumIds = parseAlbums(albumsResponse.feed.entry);
-    // console.log("googlePhotoAlbumIds: ", googlePhotoAlbumIds);
+  return new Promise( (resolve, reject) => {
 
-    // fetch each album
-    googlePhotoAlbumIds.forEach( (googlePhotoAlbumId) => {
-      fetchAlbum(googlePhotoAlbumId).then( (result) => {
-        const photos = result.entry;
-        
+    console.log('fetchAlbums');
+    fetchAlbums().then((albumsResponse) => {
+
+      console.log('albums successfully retrieved');
+
+      // get albumId's for the specific albums that represent all our google photo's
+      const googlePhotoAlbumIds = parseAlbums(albumsResponse.feed.entry);
+
+      let promises = [];
+
+      // fetch each album
+      googlePhotoAlbumIds.forEach( (googlePhotoAlbumId) => {
+        let fetchAlbumPromise = fetchAlbum(googlePhotoAlbumId);
+        promises.push(fetchAlbumPromise);
+        fetchAlbumPromise.then( (result) => {
+          const photos = result.entry;
+          photos.forEach( (photo) => {
+            const shafferPhoto = parseGooglePhoto(googlePhotoAlbumId, photo);
+            if (shafferPhotos[shafferPhoto.name]) {
+              console.log("photo ", shafferPhoto.name, " already exists");
+            }
+            shafferPhotos[shafferPhoto.name] = shafferPhoto;
+          });
+        });
+      });
+      Promise.all(promises).then( (poo) => {
         debugger;
       });
+    }, (reason) => {
+      console.log("fetchAlbums failed: ", reason);
+      reject(reason);
     });
-
-  }, (reason) => {
-    console.log("fetchAlbums failed: ", reason);
-
   });
 }
+
+
+// Program start
+
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
-fetchGooglePhotos();
+fetchGooglePhotos().then( (shafferPhotos) => {
+  console.log("number of shaffer photos from google: ", Object.keys(shafferPhotos).length);
+  debugger;
+}, (reason) => {
+  console.log("fetchGooglePhotos failed: ", reason);
+});
 
 // var pizzaFolder = path.basename('C:\\Users\\Ted\Documents\\PizzaFolder');
 // console.log(pizzaFolder);
