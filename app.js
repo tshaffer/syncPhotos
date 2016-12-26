@@ -199,6 +199,15 @@ function fetchGooglePhotos() {
 
       let promise = fetchPhotosFromAlbums(googlePhotoAlbumIds);
       promise.then( (allPhotos) => {
+
+        let shafferPhotos = {};
+        allPhotos.forEach( (photo) => {
+          if (shafferPhotos[photo.name]) {
+            console.log("photo: ", photo.name, " already exists");
+            debugger;
+          }
+          shafferPhotos[photo.name] = photo;
+        })
         debugger;
       });
       // if (photosFromAlbum[photo.name]) {
