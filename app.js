@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const express = require('express');
 const axios = require('axios');
 const sha1 = require('sha1');
+const https = require('https');
 
 const app = express();
 const googlePhotoAlbums=[
@@ -96,31 +97,60 @@ function fetchAlbum(albumId) {
   });
 }
 
-function getSha1(photoUrl) {
+
+/*
+var oReq = new XMLHttpRequest();
+oReq.open("GET", "/myfile.png", true);
+oReq.responseType = "arraybuffer";
+
+oReq.onload = function (oEvent) {
+  var arrayBuffer = oReq.response; // Note: not oReq.responseText
+  if (arrayBuffer) {
+    var byteArray = new Uint8Array(arrayBuffer);
+    for (var i = 0; i < byteArray.byteLength; i++) {
+      // do something with each byte in the array
+    }
+  }
+};
+
+oReq.send(null);*/
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
+function getSha1(photoUrl, size) {
 
   console.log("fetch photo from:", photoUrl);
 
-  // fetch(photoUrl)
-  //   .then(function(response) {
-  //     if (response.ok) {
-  //       return response.blob();
-  //     }
-  //   })
-  //   .then(function(imageBlob) {
-  //     debugger;
-  //   });
+  let buffer = new Uint8Array(size);
+  let writeIndex = 0;
 
-  return new Promise( ( resolve, reject) => {
-    axios.get(photoUrl)
-      .then(function (photo) {
-        fs.writeFileSync("tmpPhoto.jpg", photo.data);
-        const hash = sha1(photo.data);
-        resolve(hash);
-      })
-      .catch(function (err) {
-        console.log(err);
+// fetch photo from: https://lh3.googleusercontent.com/-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG
+
+  return new Promise( (resolve, reject) => {
+
+    var options = {
+        host: 'lh3.googleusercontent.com',
+        path: '-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG',
+        port: 443,
+    };
+
+    var str = "";
+
+    https.get(options, function (res) {
+        res.on('data', function (d) {
+          console.log("received a chunk of data");
+          for (let i = 0; i < d.byteLength; i++) {
+            buffer[writeIndex++] = d[i];
+          }
+        });
+        res.on('end', function () {
+          console.log("data end");
+          debugger;
+        });
+
+    }).on('error', function (err) {
+        console.log('Caught exception: ' + err);
         reject(err);
-      });
+    });
   });
 }
 
@@ -149,7 +179,7 @@ function parseGooglePhoto(albumId, photo) {
 
   const url = photo['media:group'][0]['media:content'][0].$.url;
   if (firstTime) {
-    getSha1(url).then( (sha1) => {
+    getSha1(url, size).then( (sha1) => {
       console.log("photo sha1=", sha1);
     });
     firstTime = false;
