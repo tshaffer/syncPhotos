@@ -21,6 +21,14 @@ const googlePhotoAlbums=[
   'YearPre2000' 
   ];
 
+const photoFileExtensions=[
+  'jpg',
+  'png',
+  'psd',
+  'tif',
+  'tiff'
+];
+
 // return a list of albumIds for the albums referenced above
 function parseAlbums(albums) {
   console.log("parseAlbums: # of albums=", albums.length);
@@ -86,7 +94,17 @@ function fetchAlbum(albumId) {
 function parseGooglePhoto(albumId, photo) {
   const photoId = photo['gphoto:id'][0];
   const name = photo.title[0]._;
-  const timestamp = photo['exif:tags'][0]['exif:time'][0];
+
+  let timestamp;
+  const exifTags = photo['exif:tags'][0];
+  const exifTimestamp = exifTags['exif:exif:timestamp'];
+  if (exifTimestamp) {
+    timestamp = photo['exif:tags'][0]['exif:time'][0];
+  }
+  else {
+    timestamp = photo['gphoto:timestamp'][0];
+  }
+
   const size = photo['gphoto:size'][0];
 
   let dateTime = new Date();
@@ -104,9 +122,68 @@ function parseGooglePhoto(albumId, photo) {
   };
 }
 
-function fetchGooglePhotos() {
+function getFileExtension(fileName) {
+  return fileName.split('.').pop();
+}
 
-  let shafferPhotos = {};
+// probably a better way to get this information from photo object
+function isPhoto(photo) {
+  const fileName = photo.title[0]._;
+  const ext = getFileExtension(fileName.toLowerCase());
+
+  if ( (photoFileExtensions.indexOf(ext)) >= 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
+
+  return new Promise( (resolve, reject) => {
+
+    let promises = [];
+
+    // fetch each album
+    googlePhotoAlbumIds.forEach( (googlePhotoAlbumId) => {
+      let fetchAlbumPromise = fetchAlbum(googlePhotoAlbumId);
+      promises.push(fetchAlbumPromise);
+
+
+      // fetchAlbumPromise.then( (result) => {
+      //   let photosFromAlbum = [];
+      //   const photos = result.entry;
+      //   photos.forEach( (googlePhoto) => {
+      //     if (isPhoto(googlePhoto)) {
+      //       const photo = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
+      //       photosFromAlbum.push(photo);
+      //     }
+      //   });
+      //   resolve(photosFromAlbum);
+      //   debugger;
+    });
+
+    Promise.all(promises).then( (googlePhotoAlbums) => {
+      let allPhotos = [];
+      googlePhotoAlbums.forEach( (googlePhotoAlbum) => {
+        const photosInAlbum = googlePhotoAlbum.entry;
+        photosInAlbum.forEach( (googlePhoto) => {
+          if (isPhoto(googlePhoto)) {
+            const googlePhotoAlbumId = googlePhoto['gphoto:albumid'][0];
+            const photo = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
+            allPhotos.push(photo);
+          }
+        });
+      });
+
+      resolve(allPhotos);
+    });
+  
+});
+}
+
+function fetchGooglePhotos() {
 
   console.log('fetchGooglePhotos');
 
@@ -120,30 +197,17 @@ function fetchGooglePhotos() {
       // get albumId's for the specific albums that represent all our google photo's
       const googlePhotoAlbumIds = parseAlbums(albumsResponse.feed.entry);
 
-      let promises = [];
-
-      // fetch each album
-      googlePhotoAlbumIds.forEach( (googlePhotoAlbumId) => {
-        let fetchAlbumPromise = fetchAlbum(googlePhotoAlbumId);
-        promises.push(fetchAlbumPromise);
-        fetchAlbumPromise.then( (result) => {
-          const photos = result.entry;
-          photos.forEach( (photo) => {
-            const shafferPhoto = parseGooglePhoto(googlePhotoAlbumId, photo);
-            if (shafferPhotos[shafferPhoto.name]) {
-              console.log("photo ", shafferPhoto.name, " already exists");
-            }
-            shafferPhotos[shafferPhoto.name] = shafferPhoto;
-          });
-        });
-      });
-      Promise.all(promises).then( (poo) => {
+      let promise = fetchPhotosFromAlbums(googlePhotoAlbumIds);
+      promise.then( (allPhotos) => {
         debugger;
       });
-    }, (reason) => {
-      console.log("fetchAlbums failed: ", reason);
-      reject(reason);
+      // if (photosFromAlbum[photo.name]) {
+      //   console.log("photo ", photo.name, " already exists");
+      // }
+      // photosFromAlbum[photo.name] = photo;
+
     });
+
   });
 }
 
