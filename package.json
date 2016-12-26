@@ -2,9 +2,9 @@
   "name": "syncphotos",
   "version": "0.0.1",
   "description": "Sync photos between google photos and locally stored photos",
-  "main": "main.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --config ./webpack.config.js --watch"
   },
   "author": "Ted Shaffer",
   "license": "MIT",

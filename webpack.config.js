@@ -1,6 +1,6 @@
 module.exports = {
 
-  entry: './src/autorun.js',
+  entry: './app.js',
   target: 'node',
   output: {
     path: './build',
