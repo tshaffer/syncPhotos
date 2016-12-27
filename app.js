@@ -83,6 +83,7 @@ function fetchAlbum(albumId) {
     axios.get(getAlbumUrl, {
       params: {albumId}
     }).then(function (albumResponse) {
+      console.log("album fetch complete");
       const xml = albumResponse.data;
       const parseString = require('xml2js').parseString;
       parseString(xml, function (_, result) {
@@ -123,6 +124,24 @@ function fetchAlbum(albumId) {
 // }
 
 
+function toArrayBuffer(buf) {
+    var ab = new ArrayBuffer(buf.length);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        view[i] = buf[i];
+    }
+    return ab;
+}
+
+function toBuffer(ab) {
+    var buf = new Buffer(ab.byteLength);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        buf[i] = view[i];
+    }
+    return buf;
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
 function downloadImageFile(photoUrl) {
 
@@ -152,43 +171,46 @@ function downloadImageFile(photoUrl) {
       console.log('HEADERS: ' + JSON.stringify(res.headers));
 
       console.log("length:", res.headers["content-length"]);
+
+      const fileLength = Number(res.headers["content-length"]);
+      let buffer = new Uint8Array(fileLength);
+
+      let writeIndex = 0;
       let totalLength = 0;
 
       res.on('data', function (d) {
+        buffer.set(d, writeIndex);
+        writeIndex += d.length;
+
         totalLength += d.length;
-        str += d;
       });
       res.on('end', function () {
         console.log("totalLength: ", totalLength);
         debugger;
-        console.log(str);
+
+        const ab = toArrayBuffer(buffer);
+        const abSha1 = sha1(ab);
+
+        const bf = toBuffer(buffer);
+        const bfSha1 = sha1(bf);
+        // let buffer = Buffer.from(arraybuffer);
+        // let arraybuffer = Uint8Array.from(buffer).buffer;
+        
+        // fs.open('tmpPhoto.jpg', 'w', (err, fd) => {
+        //   fs.write(fd, buffer, (err, written, buffer) => {
+        //     console.log("written: ", written);
+        //   });
+        // });
+
+        // let fileSha1 = sha1(buffer);
+        
+        // let wstream = fs.createWriteStream('tmpPhoto.jpg');
+        // wstream.write(buffer);
+        // wstream.end();
+
+        debugger;
       });
     });
-
-    // var options = {
-    //     host: 'lh3.googleusercontent.com',
-    //     path: '-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG',
-    //     port: 443,
-    // };
-    //
-    // var str = "";
-    //
-    // https.get(options, function (res) {
-    //     res.on('data', function (d) {
-    //       console.log("received a chunk of data");
-    //       for (let i = 0; i < d.byteLength; i++) {
-    //         buffer[writeIndex++] = d[i];
-    //       }
-    //     });
-    //     res.on('end', function () {
-    //       console.log("data end");
-    //       debugger;
-    //     });
-    //
-    // }).on('error', function (err) {
-    //     console.log('Caught exception: ' + err);
-    //     reject(err);
-    // });
   });
 }
 
