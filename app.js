@@ -97,60 +97,98 @@ function fetchAlbum(albumId) {
   });
 }
 
+// function downloadImageFile(url) {
+//
+//   return new Promise( (resolve, reject) => {
+//     fetch(url)
+//       .then(function(response) {
+//         if (response.ok) {
+//           return response.blob();
+//         }
+//         else {
+//           reject('File download response was not ok.');
+//         }
+//       })
+//       .catch( (error) => {
+//         reject(error);
+//       })
+//       .then(function(imageBlob) {
+//         debugger;
+//         resolve(imageBlob);
+//       })
+//       .catch( (error) => {
+//         reject(error);
+//       });
+//   });
+// }
 
-/*
-var oReq = new XMLHttpRequest();
-oReq.open("GET", "/myfile.png", true);
-oReq.responseType = "arraybuffer";
-
-oReq.onload = function (oEvent) {
-  var arrayBuffer = oReq.response; // Note: not oReq.responseText
-  if (arrayBuffer) {
-    var byteArray = new Uint8Array(arrayBuffer);
-    for (var i = 0; i < byteArray.byteLength; i++) {
-      // do something with each byte in the array
-    }
-  }
-};
-
-oReq.send(null);*/
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-function getSha1(photoUrl, size) {
+function downloadImageFile(photoUrl) {
 
   console.log("fetch photo from:", photoUrl);
 
-  let buffer = new Uint8Array(size);
-  let writeIndex = 0;
+  // let buffer = new Uint8Array(size);
+  // let writeIndex = 0;
 
 // fetch photo from: https://lh3.googleusercontent.com/-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG
 
   return new Promise( (resolve, reject) => {
 
-    var options = {
-        host: 'lh3.googleusercontent.com',
-        path: '-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG',
-        port: 443,
-    };
+    // var options = {
+    //   host: 'lh3.googleusercontent.com',
+    //   path: '-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG',
+    //   port: 443,
+    //   headers: {
+    //     'Content-Type': 'image/jpeg'
+    //   }
+    // };
 
-    var str = "";
+    var str = ""
 
-    https.get(options, function (res) {
-        res.on('data', function (d) {
-          console.log("received a chunk of data");
-          for (let i = 0; i < d.byteLength; i++) {
-            buffer[writeIndex++] = d[i];
-          }
-        });
-        res.on('end', function () {
-          console.log("data end");
-          debugger;
-        });
+    // https.get(options, function (res) {
+    https.get('https://lh3.googleusercontent.com/-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG', (res) => {  
+      console.log('STATUS: ' + res.statusCode);
+      console.log('HEADERS: ' + JSON.stringify(res.headers));
 
-    }).on('error', function (err) {
-        console.log('Caught exception: ' + err);
-        reject(err);
+      console.log("length:", res.headers["content-length"]);
+      let totalLength = 0;
+
+      res.on('data', function (d) {
+        totalLength += d.length;
+        str += d;
+      });
+      res.on('end', function () {
+        console.log("totalLength: ", totalLength);
+        debugger;
+        console.log(str);
+      });
     });
+
+    // var options = {
+    //     host: 'lh3.googleusercontent.com',
+    //     path: '-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG',
+    //     port: 443,
+    // };
+    //
+    // var str = "";
+    //
+    // https.get(options, function (res) {
+    //     res.on('data', function (d) {
+    //       console.log("received a chunk of data");
+    //       for (let i = 0; i < d.byteLength; i++) {
+    //         buffer[writeIndex++] = d[i];
+    //       }
+    //     });
+    //     res.on('end', function () {
+    //       console.log("data end");
+    //       debugger;
+    //     });
+    //
+    // }).on('error', function (err) {
+    //     console.log('Caught exception: ' + err);
+    //     reject(err);
+    // });
   });
 }
 
@@ -179,7 +217,8 @@ function parseGooglePhoto(albumId, photo) {
 
   const url = photo['media:group'][0]['media:content'][0].$.url;
   if (firstTime) {
-    getSha1(url, size).then( (sha1) => {
+    downloadImageFile(url).then( (sha1) => {
+// getSha1(url, size).then( (sha1) => {
       console.log("photo sha1=", sha1);
     });
     firstTime = false;
