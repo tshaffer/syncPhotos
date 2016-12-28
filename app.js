@@ -32,6 +32,8 @@ const photoFileExtensions=[
   'tiff'
 ];
 
+let photosById = {};
+
 // return a list of albumIds for the albums referenced above
 function parseAlbums(albums) {
   
@@ -241,12 +243,17 @@ function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
         const photosInAlbum = googlePhotoAlbum.entry;
 
         photosInAlbum.forEach( (googlePhoto) => {
-          if (isPhoto(googlePhoto)) {
-            const googlePhotoAlbumId = googlePhoto['gphoto:albumid'][0];
-            let parsePhotoPromise = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
-            parsePhotoPromises.push(parsePhotoPromise);
+
+          // check to see if photo has already been retrieved
+          const photoId = googlePhoto["gphoto:id"][0];
+          if (!photosById[photoId]) {
+            if (isPhoto(googlePhoto)) {
+              const googlePhotoAlbumId = googlePhoto['gphoto:albumid'][0];
+              let parsePhotoPromise = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
+              parsePhotoPromises.push(parsePhotoPromise);
+            }
           }
-          });
+        });
       });
 
       Promise.all(parsePhotoPromises).then( (allPhotos) => {
@@ -293,10 +300,11 @@ console.log("__dirname: ", __dirname);
 
 console.log("Read existing google photos");
 const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
-const existingGooglePhotos = JSON.parse(existingPhotosStr);
+const existingPhotosSpec = JSON.parse(existingPhotosStr);
+const existingGooglePhotos = existingPhotosSpec.photos;
 console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
 
-// merge existing and new photos
+// initialize allGooglePhotos and photosById with existing photos
 let allGooglePhotos = {};
 allGooglePhotos.version = 1;
 allGooglePhotos.photos = {};
@@ -304,9 +312,13 @@ allGooglePhotos.photos = {};
 // populate with existing photos
 for (let sha1 in existingGooglePhotos) {
   if (existingGooglePhotos.hasOwnProperty(sha1)) {
-    allGooglePhotos.photos[sha1] = existingGooglePhotos[sha1];
+    const existingGooglePhoto = existingGooglePhotos[sha1];
+    allGooglePhotos.photos[sha1] = existingGooglePhoto;
+    photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
   }
 }
+
+console.log("Number of photos in photosById: ", Object.keys(photosById).length);
 
 fetchGooglePhotos().then( (addedGooglePhotos) => {
   
