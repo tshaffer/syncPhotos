@@ -8,8 +8,8 @@ const https = require('https');
 
 const app = express();
 const googlePhotoAlbums=[
-  'Year2016', 
-  // 'Year2015',
+  // 'Year2016', 
+  'Year2015',
   // 'Year2014',
   // 'Year2013',
   // 'Year2012',
@@ -34,7 +34,8 @@ const photoFileExtensions=[
 
 // return a list of albumIds for the albums referenced above
 function parseAlbums(albums) {
-  console.log("parseAlbums: # of albums=", albums.length);
+  
+  // console.log("parseAlbums: # of albums=", albums.length);
 
   let googlePhotoAlbumIds = [];
 
@@ -43,7 +44,7 @@ function parseAlbums(albums) {
     const albumIndex = googlePhotoAlbums.indexOf(albumName);
     if (albumIndex >= 0) {
       const albumId = album['gphoto:id'][0];
-      console.log("albumId: ", albumId, " albumName: ", googlePhotoAlbums[albumIndex]);
+      // console.log("albumId: ", albumId, " albumName: ", googlePhotoAlbums[albumIndex]);
       googlePhotoAlbumIds.push(albumId);
     }
   });
@@ -86,7 +87,6 @@ function fetchAlbum(albumId) {
       const xml = albumResponse.data;
       const parseString = require('xml2js').parseString;
       parseString(xml, function (_, result) {
-        // console.dir(result);
         resolve(result.feed);
       });
     })
@@ -106,17 +106,23 @@ function toBuffer(ab) {
     return buf;
 }
 
+let numPhotosRetrieved = 0;
+
 function getPhotoDetails(photoUrl) {
 
-  console.log("fetch photo from:", photoUrl);
+  // console.log("fetch photo from:", photoUrl);
 
   return new Promise( (resolve, reject) => {
 
     https.get(photoUrl, (res) => {
-      console.log('STATUS: ' + res.statusCode);
+      const statusCode = res.statusCode;
+      if (statusCode != 200) {
+        debugger;
+      }
+      // console.log('STATUS: ' + res.statusCode);
       // console.log('HEADERS: ' + JSON.stringify(res.headers));
 
-      console.log("length:", res.headers["content-length"]);
+      // console.log("length:", res.headers["content-length"]);
 
       const fileLength = Number(res.headers["content-length"]);
       let buffer = new Uint8Array(fileLength);
@@ -131,7 +137,9 @@ function getPhotoDetails(photoUrl) {
         totalLength += d.length;
       });
       res.on('end', function () {
-        console.log("totalLength: ", totalLength);
+        // console.log("totalLength: ", totalLength);
+
+        console.log("numPhotosRetrieved: ", numPhotosRetrieved++);
 
         const bf = toBuffer(buffer);
         const bfSha1 = sha1(bf);
@@ -142,6 +150,10 @@ function getPhotoDetails(photoUrl) {
         };
         resolve(photoProperties);
       });
+    }).on('error', (e) => {
+      console.log("error: ", e.message);
+      console.log(photoUrl);
+      debugger;
     });
   });
 }
@@ -277,12 +289,37 @@ function fetchGooglePhotos() {
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
-fetchGooglePhotos().then( (shafferPhotos) => {
-  console.log("number of shaffer photos from google: ", Object.keys(shafferPhotos).length);
+console.log("Read existing google photos");
+const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
+const existingGooglePhotos = JSON.parse(existingPhotosStr);
+console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
+
+// merge existing and new photos
+let allGooglePhotos = {};
+allGooglePhotos.version = 1;
+allGooglePhotos.photos = {};
+
+// populate with existing photos
+for (let sha1 in existingGooglePhotos) {
+  if (existingGooglePhotos.hasOwnProperty(sha1)) {
+    allGooglePhotos.photos[sha1] = existingGooglePhotos[sha1];
+  }
+}
+
+fetchGooglePhotos().then( (addedGooglePhotos) => {
+  
+  console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
+
+  // merge new photos
+  for (let sha1 in addedGooglePhotos) {
+    if (addedGooglePhotos.hasOwnProperty(sha1)) {
+      allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
+    }
+  }
 
   // store google photo information in a file
-  const shafferPhotosStr = JSON.stringify(shafferPhotos, null, 2);
-  fs.writeFileSync('allGooglePhotos.json', shafferPhotosStr);
+  const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
+  fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
   console.log('Google photos reference file generation complete.');
 }, (reason) => {
   console.log("fetchGooglePhotos failed: ", reason);
