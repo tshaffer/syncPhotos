@@ -8,19 +8,19 @@ const https = require('https');
 
 const app = express();
 const googlePhotoAlbums=[
-  // 'Year2016', 
-  // 'Year2015',
-  // 'Year2014',
-  // 'Year2013',
-  // 'Year2012',
-  // 'Year2008',
-  // 'Year2007',
-  // 'Year2006',
-  // 'Year2005',
-  // 'Year2004',
-  // 'Year2003',
-  // 'Year2002',
-  // 'Year2000',
+  'Year2016', 
+  'Year2015',
+  'Year2014',
+  'Year2013',
+  'Year2012',
+  'Year2008',
+  'Year2007',
+  'Year2006',
+  'Year2005',
+  'Year2004',
+  'Year2003',
+  'Year2002',
+  'Year2000',
   'YearPre2000'
   ];
 
