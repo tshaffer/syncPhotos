@@ -107,6 +107,7 @@ function toBuffer(ab) {
 }
 
 let numPhotosRetrieved = 0;
+let numPhotosFailed = 0;
 
 function getPhotoDetails(photoUrl) {
 
@@ -151,9 +152,10 @@ function getPhotoDetails(photoUrl) {
         resolve(photoProperties);
       });
     }).on('error', (e) => {
-      console.log("error: ", e.message);
-      console.log(photoUrl);
-      debugger;
+      // console.log("error: ", e.message);
+      // console.log(photoUrl);
+      console.log("numPhotosFailed: ", numPhotosFailed++);
+      reject(photoUrl);
     });
   });
 }
@@ -193,6 +195,9 @@ function parseGooglePhoto(albumId, photo) {
         dateTime,
         sha1: photoProperties.sha1
       });
+    }, (photo) => {
+      // reject(photo);
+      resolve(null);
     });
   });
 }
@@ -238,11 +243,6 @@ function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
         photosInAlbum.forEach( (googlePhoto) => {
           if (isPhoto(googlePhoto)) {
             const googlePhotoAlbumId = googlePhoto['gphoto:albumid'][0];
-
-            // parseGooglePhoto(googlePhotoAlbumId, googlePhoto).then( (photo) => {
-            //   allPhotos.push(photo);
-            // });
-
             let parsePhotoPromise = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
             parsePhotoPromises.push(parsePhotoPromise);
           }
@@ -275,7 +275,9 @@ function fetchGooglePhotos() {
       promise.then( (allPhotos) => {
         let shafferPhotos = {};
         allPhotos.forEach( (photo) => {
-          shafferPhotos[photo.sha1] = photo;
+          if (photo) {
+            shafferPhotos[photo.sha1] = photo;
+          }
         })
         resolve(shafferPhotos);
       });
