@@ -9,7 +9,7 @@ const https = require('https');
 const app = express();
 const googlePhotoAlbums=[
   // 'Year2016', 
-  'Year2015',
+  // 'Year2015',
   // 'Year2014',
   // 'Year2013',
   // 'Year2012',
@@ -21,7 +21,7 @@ const googlePhotoAlbums=[
   // 'Year2003',
   // 'Year2002',
   // 'Year2000',
-  // 'YearPre2000'
+  'YearPre2000'
   ];
 
 const photoFileExtensions=[
