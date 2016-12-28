@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 
 const express = require('express');
 const axios = require('axios');
@@ -10,19 +9,19 @@ const https = require('https');
 const app = express();
 const googlePhotoAlbums=[
   'Year2016', 
-  'Year2015', 
-  'Year2014', 
-  'Year2013', 
-  'Year2012', 
-  'Year2008', 
-  'Year2007', 
-  'Year2006', 
-  'Year2005', 
-  'Year2004', 
-  'Year2003', 
-  'Year2002', 
-  'Year2000',
-  'YearPre2000' 
+  // 'Year2015',
+  // 'Year2014',
+  // 'Year2013',
+  // 'Year2012',
+  // 'Year2008',
+  // 'Year2007',
+  // 'Year2006',
+  // 'Year2005',
+  // 'Year2004',
+  // 'Year2003',
+  // 'Year2002',
+  // 'Year2000',
+  // 'YearPre2000'
   ];
 
 const photoFileExtensions=[
@@ -42,7 +41,7 @@ function parseAlbums(albums) {
   albums.forEach( (album) => {
     const albumName = album.title[0]._;
     const albumIndex = googlePhotoAlbums.indexOf(albumName);
-    if (albumIndex > 0) {
+    if (albumIndex >= 0) {
       const albumId = album['gphoto:id'][0];
       console.log("albumId: ", albumId, " albumName: ", googlePhotoAlbums[albumIndex]);
       googlePhotoAlbumIds.push(albumId);
@@ -98,41 +97,6 @@ function fetchAlbum(albumId) {
   });
 }
 
-// function downloadImageFile(url) {
-//
-//   return new Promise( (resolve, reject) => {
-//     fetch(url)
-//       .then(function(response) {
-//         if (response.ok) {
-//           return response.blob();
-//         }
-//         else {
-//           reject('File download response was not ok.');
-//         }
-//       })
-//       .catch( (error) => {
-//         reject(error);
-//       })
-//       .then(function(imageBlob) {
-//         debugger;
-//         resolve(imageBlob);
-//       })
-//       .catch( (error) => {
-//         reject(error);
-//       });
-//   });
-// }
-
-
-function toArrayBuffer(buf) {
-    var ab = new ArrayBuffer(buf.length);
-    var view = new Uint8Array(ab);
-    for (var i = 0; i < buf.length; ++i) {
-        view[i] = buf[i];
-    }
-    return ab;
-}
-
 function toBuffer(ab) {
     var buf = new Buffer(ab.byteLength);
     var view = new Uint8Array(ab);
@@ -142,33 +106,15 @@ function toBuffer(ab) {
     return buf;
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-function downloadImageFile(photoUrl) {
+function getPhotoDetails(photoUrl) {
 
   console.log("fetch photo from:", photoUrl);
 
-  // let buffer = new Uint8Array(size);
-  // let writeIndex = 0;
-
-// fetch photo from: https://lh3.googleusercontent.com/-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG
-
   return new Promise( (resolve, reject) => {
 
-    // var options = {
-    //   host: 'lh3.googleusercontent.com',
-    //   path: '-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG',
-    //   port: 443,
-    //   headers: {
-    //     'Content-Type': 'image/jpeg'
-    //   }
-    // };
-
-    var str = ""
-
-    // https.get(options, function (res) {
-    https.get('https://lh3.googleusercontent.com/-HRiwx_yv_UU/WGBh33yrLfI/AAAAAAAAER0/DUVYBOY-lfwJfldRuIm49tzGWfiuIwALQCHM/14.JPG', (res) => {  
+    https.get(photoUrl, (res) => {
       console.log('STATUS: ' + res.statusCode);
-      console.log('HEADERS: ' + JSON.stringify(res.headers));
+      // console.log('HEADERS: ' + JSON.stringify(res.headers));
 
       console.log("length:", res.headers["content-length"]);
 
@@ -186,88 +132,57 @@ function downloadImageFile(photoUrl) {
       });
       res.on('end', function () {
         console.log("totalLength: ", totalLength);
-        debugger;
-
-        const ab = toArrayBuffer(buffer);
-        const abSha1 = sha1(ab);
 
         const bf = toBuffer(buffer);
         const bfSha1 = sha1(bf);
-        // let buffer = Buffer.from(arraybuffer);
-        // let arraybuffer = Uint8Array.from(buffer).buffer;
-        
-        // fs.open('tmpPhoto.jpg', 'w', (err, fd) => {
-        //   fs.write(fd, buffer, (err, written, buffer) => {
-        //     console.log("written: ", written);
-        //   });
-        // });
 
-        // let fileSha1 = sha1(buffer);
-        
-        // let wstream = fs.createWriteStream('tmpPhoto.jpg');
-        // wstream.write(buffer);
-        // wstream.end();
-
-        debugger;
+        photoProperties = {
+          sha1: bfSha1,
+          size: totalLength
+        };
+        resolve(photoProperties);
       });
     });
   });
 }
 
-let firstTime = true;
-
 function parseGooglePhoto(albumId, photo) {
-  const photoId = photo['gphoto:id'][0];
-  const name = photo.title[0]._;
 
-  let timestamp;
-  const exifTags = photo['exif:tags'][0];
-  const exifTimestamp = exifTags['exif:exif:timestamp'];
-  if (exifTimestamp) {
-    timestamp = photo['exif:tags'][0]['exif:time'][0];
-  }
-  else {
-    timestamp = photo['gphoto:timestamp'][0];
-  }
+  return new Promise( (resolve, reject) => {
 
-  const size = photo['gphoto:size'][0];
+    const photoId = photo['gphoto:id'][0];
+    const name = photo.title[0]._;
 
-  let dateTime = new Date();
-  let ts = Number(timestamp);
-  dateTime.setTime(ts);
-  // const dateTime = new Date().setTime(Number(timestamp));
+    let timestamp;
+    const exifTags = photo['exif:tags'][0];
+    const exifTimestamp = exifTags['exif:exif:timestamp'];
+    if (exifTimestamp) {
+      timestamp = photo['exif:tags'][0]['exif:time'][0];
+    }
+    else {
+      timestamp = photo['gphoto:timestamp'][0];
+    }
 
-  const url = photo['media:group'][0]['media:content'][0].$.url;
-  if (firstTime) {
-    downloadImageFile(url).then( (sha1) => {
-// getSha1(url, size).then( (sha1) => {
-      console.log("photo sha1=", sha1);
+    const size = photo['gphoto:size'][0];
+
+    let dateTime = new Date();
+    let ts = Number(timestamp);
+    dateTime.setTime(ts);
+    // const dateTime = new Date().setTime(Number(timestamp));
+
+    const url = photo['media:group'][0]['media:content'][0].$.url;
+    getPhotoDetails(url).then( (photoProperties) => {
+      resolve({
+        albumId,
+        photoId,
+        name,
+        size: photoProperties.size,
+        timestamp,
+        dateTime,
+        sha1: photoProperties.sha1
+      });
     });
-    firstTime = false;
-  }
-
-  const algorithm = 'sha1';
-  const shasum = crypto.createHash(algorithm);
-//   const filename = __dirname + "/anything.txt";
-
-//   , s = fs.ReadStream(filename)
-// s.on('data', function(data) {
-//   shasum.update(data)
-// })
-// making digest
-// s.on('end', function() {
-//   var hash = shasum.digest('hex')
-//   console.log(hash + '  ' + filename)
-// })
-
-  return {
-    albumId,
-    photoId,
-    name,
-    size,
-    timestamp,
-    dateTime
-  };
+  });
 }
 
 function getFileExtension(fileName) {
@@ -304,18 +219,27 @@ function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
     // figure out the right way to do it.
     Promise.all(promises).then( (googlePhotoAlbums) => {
       let allPhotos = [];
+      let parsePhotoPromises = [];
       googlePhotoAlbums.forEach( (googlePhotoAlbum) => {
         const photosInAlbum = googlePhotoAlbum.entry;
+
         photosInAlbum.forEach( (googlePhoto) => {
           if (isPhoto(googlePhoto)) {
             const googlePhotoAlbumId = googlePhoto['gphoto:albumid'][0];
-            const photo = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
-            allPhotos.push(photo);
+
+            // parseGooglePhoto(googlePhotoAlbumId, googlePhoto).then( (photo) => {
+            //   allPhotos.push(photo);
+            // });
+
+            let parsePhotoPromise = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
+            parsePhotoPromises.push(parsePhotoPromise);
           }
-        });
+          });
       });
 
-      resolve(allPhotos);
+      Promise.all(parsePhotoPromises).then( (allPhotos) => {
+        resolve(allPhotos);
+      });
     });
   });
 }
@@ -339,11 +263,7 @@ function fetchGooglePhotos() {
       promise.then( (allPhotos) => {
         let shafferPhotos = {};
         allPhotos.forEach( (photo) => {
-          if (shafferPhotos[photo.photoId]) {
-            console.log("photo: ", photo.photoId, " already exists");
-            debugger;
-          }
-          shafferPhotos[photo.photoId] = photo;
+          shafferPhotos[photo.sha1] = photo;
         })
         resolve(shafferPhotos);
       });
@@ -359,20 +279,12 @@ console.log("__dirname: ", __dirname);
 
 fetchGooglePhotos().then( (shafferPhotos) => {
   console.log("number of shaffer photos from google: ", Object.keys(shafferPhotos).length);
+
+  // store google photo information in a file
+  const shafferPhotosStr = JSON.stringify(shafferPhotos, null, 2);
+  fs.writeFileSync('allGooglePhotos.json', shafferPhotosStr);
+  console.log('Google photos reference file generation complete.');
 }, (reason) => {
   console.log("fetchGooglePhotos failed: ", reason);
 });
-
-// var pizzaFolder = path.basename('C:\\Users\\Ted\Documents\\PizzaFolder');
-// console.log(pizzaFolder);
-
-// var pizzaFolder2 = path.win32.basename('C:\\Users\\Ted\Documents\\PizzaFolder');
-// console.log(pizzaFolder2);
-
-// var testFolder = 'C:\\Users\\Ted\\Documents\\PizzaFolder';
-// fs.readdir(testFolder, (err, files) => {
-//   files.forEach(file => {
-//     console.log(file);
-//   });
-// })
 
