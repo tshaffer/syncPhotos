@@ -302,31 +302,36 @@ function readGooglePhotoFiles(path) {
 // });
 
 
-function buildPhotosByKey(existingGooglePhotos) {
+function buildPhotoDictionaries(existingGooglePhotos) {
+  
   let photosByKey = {};
+  let photosByExifDateTime = {};
+  let numDuplicates = 0;
   existingGooglePhotos.forEach( (photo) => {
+
+    if (photo.exifDateTime && photo.exifDateTime !== '') {
+      photosByExifDateTime[photo.exifDateTime] = photo;
+    }  
+    else {
       const key = photo.name + '-' + photo.width + photo.height;
       if (photosByKey[key]) {
-
-        if ((photosByKey[key].exifDateTime === "") && (photo.exifDateTime === "")) {
-          console.log("existingPhoto: ");
-          console.log(photosByKey[key]);
-
-          console.log("new photo: ");
-          console.log(photo);
-        }
+        numDuplicates++;
       }
       else {
         photosByKey[key] = photo;
       }
+    }
   });
 
-  return photosByKey;
+  return {
+    photosByKey,
+    photosByExifDateTime
+  };
 }
 
 function findMissingFiles(existingGooglePhotos) {
 
-  const photosByKey = buildPhotosByKey(existingGooglePhotos);
+  const photosByKey = buildPhotoDictionaries(existingGooglePhotos);
 
   let driveExists = fs.existsSync("d:/");
   console.log(driveExists);
