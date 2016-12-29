@@ -1,5 +1,7 @@
 const path = require('path');
 const fs = require('fs');
+const readline = require('readline');
+const nodeDir = require('node-dir');
 
 const express = require('express');
 const axios = require('axios');
@@ -208,17 +210,20 @@ function getFileExtension(fileName) {
   return fileName.split('.').pop();
 }
 
-// probably a better way to get this information from photo object
-function isPhoto(photo) {
-  const fileName = photo.title[0]._;
+function isPhotoFile(fileName) {
   const ext = getFileExtension(fileName.toLowerCase());
-
   if ( (photoFileExtensions.indexOf(ext)) >= 0) {
     return true;
   }
   else {
     return false;
   }
+}
+
+// probably a better way to get this information from photo object
+function isPhoto(photo) {
+  const fileName = photo.title[0]._;
+  return isPhotoFile(fileName);
 }
 
 function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
@@ -294,48 +299,104 @@ function fetchGooglePhotos() {
 
 
 // Program start
+// all return true
+let driveExists = fs.existsSync("d:/");
+console.log(driveExists);
+driveExists = fs.existsSync("d://");
+console.log(driveExists);
+driveExists = fs.existsSync("d:\\");
+console.log(driveExists);
 
-console.log("syncPhotos - start");
-console.log("__dirname: ", __dirname);
+const dirContents = fs.readdirSync("d:/");
+console.log(dirContents);
 
-console.log("Read existing google photos");
-const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
-const existingPhotosSpec = JSON.parse(existingPhotosStr);
-const existingGooglePhotos = existingPhotosSpec.photos;
-console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
+// list all files
+// https://gist.github.com/kethinov/6658166
+// http://stackoverflow.com/questions/5827612/node-js-fs-readdir-recursive-directory-search
 
-// initialize allGooglePhotos and photosById with existing photos
-let allGooglePhotos = {};
-allGooglePhotos.version = 1;
-allGooglePhotos.photos = {};
+dirContents.forEach( (dirContent) => {
 
-// populate with existing photos
-for (let sha1 in existingGooglePhotos) {
-  if (existingGooglePhotos.hasOwnProperty(sha1)) {
-    const existingGooglePhoto = existingGooglePhotos[sha1];
-    allGooglePhotos.photos[sha1] = existingGooglePhoto;
-    photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
-  }
-}
-
-console.log("Number of photos in photosById: ", Object.keys(photosById).length);
-
-fetchGooglePhotos().then( (addedGooglePhotos) => {
-  
-  console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
-
-  // merge new photos
-  for (let sha1 in addedGooglePhotos) {
-    if (addedGooglePhotos.hasOwnProperty(sha1)) {
-      allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
-    }
-  }
-
-  // store google photo information in a file
-  const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
-  fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
-  console.log('Google photos reference file generation complete.');
-}, (reason) => {
-  console.log("fetchGooglePhotos failed: ", reason);
+  let path = "d:/" + dirContent;
+  const isDir = fs.lstatSync(path).isDirectory()
+  const isFile = fs.lstatSync(path).isFile();
+  console.log(path, " ", isDir, " ", isFile);
+  // let fd = fs.openSync("d:/" + dirContent, 'r');
+  // console.log(fd);
 });
 
+nodeDir.files("d:/", function(err, files) {
+    if (err) throw err;
+    files = files.filter(isPhotoFile);
+    console.log(files);
+});
+
+
+
+
+
+
+
+
+// console.log("syncPhotos - start");
+// console.log("__dirname: ", __dirname);
+
+// console.log("Read existing google photos");
+// const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
+// const existingPhotosSpec = JSON.parse(existingPhotosStr);
+// const existingGooglePhotos = existingPhotosSpec.photos;
+// console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
+
+// // initialize allGooglePhotos and photosById with existing photos
+// let allGooglePhotos = {};
+// allGooglePhotos.version = 1;
+// allGooglePhotos.photos = {};
+
+// // populate with existing photos
+// for (let sha1 in existingGooglePhotos) {
+//   if (existingGooglePhotos.hasOwnProperty(sha1)) {
+//     const existingGooglePhoto = existingGooglePhotos[sha1];
+//     allGooglePhotos.photos[sha1] = existingGooglePhoto;
+//     photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
+//   }
+// }
+
+// console.log("Number of photos in photosById: ", Object.keys(photosById).length);
+
+
+
+
+
+
+// fetchGooglePhotos().then( (addedGooglePhotos) => {
+  
+//   console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
+
+//   // merge new photos
+//   for (let sha1 in addedGooglePhotos) {
+//     if (addedGooglePhotos.hasOwnProperty(sha1)) {
+//       allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
+//     }
+//   }
+
+//   // store google photo information in a file
+//   const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
+//   fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
+//   console.log('Google photos reference file generation complete.');
+// }, (reason) => {
+//   console.log("fetchGooglePhotos failed: ", reason);
+// });
+
+// http://stackoverflow.com/questions/36094026/unable-to-read-from-console-in-node-js-using-vs-code
+// https://code.visualstudio.com/Docs/editor/debugging
+
+// const rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout
+// });
+
+// rl.question('What do you think of Node.js? ', (answer) => {
+//   // TODO: Log the answer in a database
+//   console.log(`Thank you for your valuable feedback: ${answer}`);
+
+//   rl.close();
+// });
