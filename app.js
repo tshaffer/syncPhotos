@@ -1,3 +1,8 @@
+// http://stackoverflow.com/questions/30179571/are-there-bookmarks-in-visual-studio-code
+// https://marketplace.visualstudio.com/items?itemName=alefragnani.Bookmarks
+// Ctrl-Alt K - toggle bookmarks
+// Ctrl-Alt L - goto bookmarks
+
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
@@ -5,15 +10,11 @@ const nodeDir = require('node-dir');
 
 const express = require('express');
 const axios = require('axios');
-const sha1 = require('sha1');
 const https = require('https');
-
-const hashFiles = require('hash-files');
-var sha1File = require('sha1-file');
 
 const app = express();
 const googlePhotoAlbums=[
-  // 'Year2016', 
+  'Year2016', 
   // 'Year2015',
   // 'Year2014',
   // 'Year2013',
@@ -25,7 +26,7 @@ const googlePhotoAlbums=[
   // 'Year2004',
   // 'Year2003',
   // 'Year2002',
-  'Year2001'
+  // 'Year2001',
   // 'Year2000',
   // 'YearPre2000'
   ];
@@ -38,6 +39,8 @@ const photoFileExtensions=[
   'tiff'
 ];
 
+// initialize 'global' variables
+const fetchingGooglePhotos = true;
 let photosById = {};
 
 // return a list of albumIds for the albums referenced above
@@ -105,109 +108,44 @@ function fetchAlbum(albumId) {
   });
 }
 
-function toBuffer(ab) {
-    var buf = new Buffer(ab.byteLength);
-    var view = new Uint8Array(ab);
-    for (var i = 0; i < buf.length; ++i) {
-        buf[i] = view[i];
-    }
-    return buf;
-}
+function parseGooglePhoto(photo) {
 
-let numPhotosRetrieved = 0;
-let numPhotosFailed = 0;
+  const photoId = photo['gphoto:id'][0];
+  const name = photo.title[0]._;
+  const url = photo['media:group'][0]['media:content'][0].$.url;
+  const width = photo["gphoto:width"][0];
+  const height = photo["gphoto:height"][0];
 
-function getPhotoDetails(photoUrl) {
+  const exifTags = photo['exif:tags'][0];
 
-  // console.log("fetch photo from:", photoUrl);
+  let timestamp;
+  const exifTimestamp = exifTags['exif:time'];
+  if (exifTimestamp) {
+    timestamp = photo['exif:tags'][0]['exif:time'][0];
+  }
+  else {
+    timestamp = photo['gphoto:timestamp'][0];
+  }
+  let dateTime = new Date();
+  let ts = Number(timestamp);
+  dateTime.setTime(ts);
 
-  return new Promise( (resolve, reject) => {
+  let imageUniqueId = '';
+  const exifUniqueIdTag = exifTags["exif:imageUniqueID"];
+  if (exifUniqueIdTag) {
+    imageUniqueId = exifUniqueIdTag[0];
+  }
 
-    https.get(photoUrl, (res) => {
-      const statusCode = res.statusCode;
-      if (statusCode != 200) {
-        debugger;
-      }
-      // console.log('STATUS: ' + res.statusCode);
-      // console.log('HEADERS: ' + JSON.stringify(res.headers));
-
-      // console.log("length:", res.headers["content-length"]);
-
-      const fileLength = Number(res.headers["content-length"]);
-      let buffer = new Uint8Array(fileLength);
-
-      let writeIndex = 0;
-      let totalLength = 0;
-
-      res.on('data', function (d) {
-        buffer.set(d, writeIndex);
-        writeIndex += d.length;
-
-        totalLength += d.length;
-      });
-      res.on('end', function () {
-        // console.log("totalLength: ", totalLength);
-
-        console.log("numPhotosRetrieved: ", numPhotosRetrieved++);
-
-        const bf = toBuffer(buffer);
-        const bfSha1 = sha1(bf);
-
-        photoProperties = {
-          sha1: bfSha1,
-          size: totalLength
-        };
-        resolve(photoProperties);
-      });
-    }).on('error', (e) => {
-      // console.log("error: ", e.message);
-      // console.log(photoUrl);
-      console.log("numPhotosFailed: ", numPhotosFailed++);
-      reject(photoUrl);
-    });
-  });
-}
-
-function parseGooglePhoto(albumId, photo) {
-
-  return new Promise( (resolve, reject) => {
-
-    const photoId = photo['gphoto:id'][0];
-    const name = photo.title[0]._;
-
-    let timestamp;
-    const exifTags = photo['exif:tags'][0];
-    const exifTimestamp = exifTags['exif:exif:timestamp'];
-    if (exifTimestamp) {
-      timestamp = photo['exif:tags'][0]['exif:time'][0];
-    }
-    else {
-      timestamp = photo['gphoto:timestamp'][0];
-    }
-
-    const size = photo['gphoto:size'][0];
-
-    let dateTime = new Date();
-    let ts = Number(timestamp);
-    dateTime.setTime(ts);
-    // const dateTime = new Date().setTime(Number(timestamp));
-
-    const url = photo['media:group'][0]['media:content'][0].$.url;
-    getPhotoDetails(url).then( (photoProperties) => {
-      resolve({
-        albumId,
-        photoId,
-        name,
-        size: photoProperties.size,
-        timestamp,
-        dateTime,
-        sha1: photoProperties.sha1
-      });
-    }, (photo) => {
-      // reject(photo);
-      resolve(null);
-    });
-  });
+  return {
+    photoId,
+    name,
+    url,
+    width,
+    height,
+    timestamp,
+    dateTime,
+    imageUniqueId
+  };
 }
 
 function getFileExtension(fileName) {
@@ -257,17 +195,13 @@ function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
           const photoId = googlePhoto["gphoto:id"][0];
           if (!photosById[photoId]) {
             if (isPhoto(googlePhoto)) {
-              const googlePhotoAlbumId = googlePhoto['gphoto:albumid'][0];
-              let parsePhotoPromise = parseGooglePhoto(googlePhotoAlbumId, googlePhoto);
-              parsePhotoPromises.push(parsePhotoPromise);
+              const photo = parseGooglePhoto(googlePhoto);
+              allPhotos.push(photo);
             }
           }
         });
       });
-
-      Promise.all(parsePhotoPromises).then( (allPhotos) => {
-        resolve(allPhotos);
-      });
+      resolve(allPhotos);
     });
   });
 }
@@ -306,93 +240,76 @@ function fetchGooglePhotos() {
 //    ignore exif info as that can't be relied on
 //    resolution: matches
 //    filename: matches
-//    dates
-//      google photos dates: 3/9/2001 (in UI)
-//      disk dates: 3/13/2001
+//    exif info if available
 
 
 // Program start
-let driveExists = fs.existsSync("d:/");
-console.log(driveExists);
-
-// d:\Complete\3_01\P3090001.JPG
-// E45BDC199A7DC16A842D176A5C9BA5766296BA0A
-
-// test sha1
-// photoFile = 'd://Complete//3_01//P3090001.JPG';
-// const hash = sha1File(photoFile);
-// console.log(hash);
-
-// nodeDir.files("d:/", function(err, files) {
-//   if (err) throw err;
-//   files = files.filter(isPhotoFile);
-//   let photoFile = files[0];
-//   console.log(photoFile);
-
-//   const hash = sha1File(photoFile);
-//   console.log(hash);
-
-//   files.forEach( (photoFile) => {
-//     const hash = sha1File(photoFile);
-//     console.log(hash);
-//   });
-// });
+// let driveExists = fs.existsSync("d:/");
+// console.log(driveExists);
 
 
 
 
-
-
-
-
-console.log("syncPhotos - start");
-console.log("__dirname: ", __dirname);
-
-console.log("Read existing google photos");
-const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
-const existingPhotosSpec = JSON.parse(existingPhotosStr);
-const existingGooglePhotos = existingPhotosSpec.photos;
-console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
-
-// initialize allGooglePhotos and photosById with existing photos
-let allGooglePhotos = {};
-allGooglePhotos.version = 1;
-allGooglePhotos.photos = {};
-
-// populate with existing photos
-for (let sha1 in existingGooglePhotos) {
-  if (existingGooglePhotos.hasOwnProperty(sha1)) {
-    const existingGooglePhoto = existingGooglePhotos[sha1];
-    allGooglePhotos.photos[sha1] = existingGooglePhoto;
-    photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
-  }
+function readGooglePhotoFiles(path) {
+  return new Promise( (resolve, reject) => {
+    fs.readFile(path, (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      else {
+        resolve(data);
+      }
+    });
+  });
 }
 
-console.log("Number of photos in photosById: ", Object.keys(photosById).length);
+
+
+
+// const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
+// const existingPhotosSpec = JSON.parse(existingPhotosStr);
+// const existingGooglePhotos = existingPhotosSpec.photos;
+// console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
+
+// // initialize allGooglePhotos and photosById with existing photos
+// let allGooglePhotos = {};
+// allGooglePhotos.version = 1;
+// allGooglePhotos.photos = {};
+
+// // populate with existing photos
+// for (let sha1 in existingGooglePhotos) {
+//   if (existingGooglePhotos.hasOwnProperty(sha1)) {
+//     const existingGooglePhoto = existingGooglePhotos[sha1];
+//     allGooglePhotos.photos[sha1] = existingGooglePhoto;
+//     photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
+//   }
+// }
+
+// console.log("Number of photos in photosById: ", Object.keys(photosById).length);
 
 
 
 
 
 
-fetchGooglePhotos().then( (addedGooglePhotos) => {
+// fetchGooglePhotos().then( (addedGooglePhotos) => {
   
-  console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
+//   console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
 
-  // merge new photos
-  for (let sha1 in addedGooglePhotos) {
-    if (addedGooglePhotos.hasOwnProperty(sha1)) {
-      allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
-    }
-  }
+//   // merge new photos
+//   for (let sha1 in addedGooglePhotos) {
+//     if (addedGooglePhotos.hasOwnProperty(sha1)) {
+//       allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
+//     }
+//   }
 
-  // store google photo information in a file
-  const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
-  fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
-  console.log('Google photos reference file generation complete.');
-}, (reason) => {
-  console.log("fetchGooglePhotos failed: ", reason);
-});
+//   // store google photo information in a file
+//   const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
+//   fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
+//   console.log('Google photos reference file generation complete.');
+// }, (reason) => {
+//   console.log("fetchGooglePhotos failed: ", reason);
+// });
 
 // http://stackoverflow.com/questions/36094026/unable-to-read-from-console-in-node-js-using-vs-code
 // https://code.visualstudio.com/Docs/editor/debugging
@@ -408,3 +325,41 @@ fetchGooglePhotos().then( (addedGooglePhotos) => {
 
 //   rl.close();
 // });
+
+
+
+console.log("syncPhotos - start");
+console.log("__dirname: ", __dirname);
+
+console.log("Retrieve existing google photos");
+let existingGooglePhotos = {};
+let promise = readGooglePhotoFiles('allGooglePhotos.json');
+promise.then((existingPhotosStr) => {
+  const existingPhotosSpec = JSON.parse(existingPhotosStr);
+  existingGooglePhotos = existingPhotosSpec.photos;
+}, (reason) => {
+  console.log('Error reading allGooglePhotos.json: ');
+});
+console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
+
+if (fetchingGooglePhotos) {
+
+  fetchGooglePhotos().then( (addedGooglePhotos) => {
+    
+    console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
+
+    // merge new photos
+    for (let sha1 in addedGooglePhotos) {
+      if (addedGooglePhotos.hasOwnProperty(sha1)) {
+        allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
+      }
+    }
+
+    // store google photo information in a file
+    const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
+    fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
+    console.log('Google photos reference file generation complete.');
+  }, (reason) => {
+    console.log("fetchGooglePhotos failed: ", reason);
+  });
+}
