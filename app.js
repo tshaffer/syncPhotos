@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 const nodeDir = require('node-dir');
+const exifImage = require('exif').ExifImage;
 
 const express = require('express');
 const axios = require('axios');
@@ -40,7 +41,7 @@ const photoFileExtensions=[
 ];
 
 // initialize 'global' variables
-const fetchingGooglePhotos = true;
+const fetchingGooglePhotos = false;
 let photosById = {};
 
 // return a list of albumIds for the albums referenced above
@@ -301,30 +302,86 @@ function readGooglePhotoFiles(path) {
 // });
 
 
-function findMissingFiles(existingGooglePhotos) {
-
+function buildPhotosByKey(existingGooglePhotos) {
   let photosByKey = {};
   existingGooglePhotos.forEach( (photo) => {
       const key = photo.name + '-' + photo.width + photo.height;
       if (photosByKey[key]) {
 
-        console.log("existingPhoto: ");
-        console.log(photosByKey[key]);
+        if ((photosByKey[key].exifDateTime === "") && (photo.exifDateTime === "")) {
+          console.log("existingPhoto: ");
+          console.log(photosByKey[key]);
 
-        console.log("new photo: ");
-        console.log(photo);
-        // debugger;
+          console.log("new photo: ");
+          console.log(photo);
+        }
       }
       else {
         photosByKey[key] = photo;
       }
   });
-  debugger;
+
+  return photosByKey;
+}
+
+function findMissingFiles(existingGooglePhotos) {
+
+  const photosByKey = buildPhotosByKey(existingGooglePhotos);
 
   let driveExists = fs.existsSync("d:/");
   console.log(driveExists);
 
+  nodeDir.files("d:/", (err, files) => {
+    if (err) throw err;
+    files = files.filter(isPhotoFile);
+    let photoFile = files[0];
+    console.log(photoFile);
+
+// exifData.exif.CreateDate
+// "2001:02:18 09:14:34"
+// var d = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+    try {
+        new exifImage({ image : photoFile }, function (error, exifData) {
+            if (error)
+                console.log('Error: '+error.message);
+            else
+                console.log(exifData); // Do something with your data! 
+                const exifDateTimeStr = exifData.exif.CreateDate;
+                const year = Number(exifDateTimeStr.substring(0, 4));
+                const month = Number(exifDateTimeStr.substring(5, 7)) - 1;
+                const day = Number(exifDateTimeStr.substring(8, 10));
+                const hours = Number(exifDateTimeStr.substring(11, 13));
+                const minutes = Number(exifDateTimeStr.substring(14, 16));
+                const seconds = Number(exifDateTimeStr.substring(17, 19));
+                const exifDateTime = new Date(year, month, day, hours, minutes, seconds);
+
+                console.log(photoFile);
+                console.log(exifDateTime);
+
+                debugger;
+        });
+    } catch (error) {
+        console.log('Error: ' + error.message);
+    }
+
+
+
+    // files.forEach( (file) => {
+    //   try {
+    //       new exifImage({ image : file }, function (error, exifData) {
+    //           if (error)
+    //               console.log('Error: '+error.message);
+    //           else
+    //               console.log(exifData); // Do something with your data! 
+    //       });
+    //   } catch (error) {
+    //       console.log('Error: ' + error.message);
+    //   }
+    // });
+  });
 }
+
+
 
 // Program start
 console.log("syncPhotos - start");
@@ -338,7 +395,7 @@ promise.then((existingPhotosStr) => {
   existingGooglePhotos = existingPhotosSpec.photos;
   console.log("Number of existing google photos: ", existingGooglePhotos.length);
 
-  // findMissingFiles(existingGooglePhotos);
+  findMissingFiles(existingGooglePhotos);
 
 }, (reason) => {
   console.log('Error reading allGooglePhotos.json: ');
