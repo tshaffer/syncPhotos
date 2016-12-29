@@ -15,20 +15,20 @@ const https = require('https');
 const app = express();
 const googlePhotoAlbums=[
   'Year2016', 
-  // 'Year2015',
-  // 'Year2014',
-  // 'Year2013',
-  // 'Year2012',
-  // 'Year2008',
-  // 'Year2007',
-  // 'Year2006',
-  // 'Year2005',
-  // 'Year2004',
-  // 'Year2003',
-  // 'Year2002',
-  // 'Year2001',
-  // 'Year2000',
-  // 'YearPre2000'
+  'Year2015',
+  'Year2014',
+  'Year2013',
+  'Year2012',
+  'Year2008',
+  'Year2007',
+  'Year2006',
+  'Year2005',
+  'Year2004',
+  'Year2003',
+  'Year2002',
+  'Year2001',
+  'Year2000',
+  'YearPre2000'
   ];
 
 const photoFileExtensions=[
@@ -162,7 +162,6 @@ function isPhotoFile(fileName) {
   }
 }
 
-// probably a better way to get this information from photo object
 function isPhoto(photo) {
   const fileName = photo.title[0]._;
   return isPhotoFile(fileName);
@@ -185,12 +184,9 @@ function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
     // figure out the right way to do it.
     Promise.all(promises).then( (googlePhotoAlbums) => {
       let allPhotos = [];
-      let parsePhotoPromises = [];
       googlePhotoAlbums.forEach( (googlePhotoAlbum) => {
         const photosInAlbum = googlePhotoAlbum.entry;
-
         photosInAlbum.forEach( (googlePhoto) => {
-
           // check to see if photo has already been retrieved
           const photoId = googlePhoto["gphoto:id"][0];
           if (!photosById[photoId]) {
@@ -223,13 +219,7 @@ function fetchGooglePhotos() {
       // get all photos in an array
       let promise = fetchPhotosFromAlbums(googlePhotoAlbumIds);
       promise.then( (allPhotos) => {
-        let shafferPhotos = {};
-        allPhotos.forEach( (photo) => {
-          if (photo) {
-            shafferPhotos[photo.sha1] = photo;
-          }
-        })
-        resolve(shafferPhotos);
+        resolve(allPhotos);
       });
     });
   });
@@ -332,32 +322,32 @@ console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
 console.log("Retrieve existing google photos");
-let existingGooglePhotos = {};
+let existingGooglePhotos = [];
 let promise = readGooglePhotoFiles('allGooglePhotos.json');
 promise.then((existingPhotosStr) => {
   const existingPhotosSpec = JSON.parse(existingPhotosStr);
   existingGooglePhotos = existingPhotosSpec.photos;
+  console.log("Number of existing google photos: ", existingGooglePhotos.length);
 }, (reason) => {
   console.log('Error reading allGooglePhotos.json: ');
 });
-console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
 
 if (fetchingGooglePhotos) {
 
   fetchGooglePhotos().then( (addedGooglePhotos) => {
     
-    console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
+    console.log("Number of photos retrieved from google: ", addedGooglePhotos.length);
 
-    // merge new photos
-    for (let sha1 in addedGooglePhotos) {
-      if (addedGooglePhotos.hasOwnProperty(sha1)) {
-        allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
-      }
-    }
+    // merge new photos (NOT MERGING YET)
+    let allGooglePhotos = addedGooglePhotos;
+
+    let allGooglePhotosSpec = {};
+    allGooglePhotosSpec.version = 2;
+    allGooglePhotosSpec.photos = allGooglePhotos;
 
     // store google photo information in a file
-    const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
-    fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
+    const allGooglePhotosSpecStr = JSON.stringify(allGooglePhotosSpec, null, 2);
+    fs.writeFileSync('allGooglePhotos.json', allGooglePhotosSpecStr);
     console.log('Google photos reference file generation complete.');
   }, (reason) => {
     console.log("fetchGooglePhotos failed: ", reason);
