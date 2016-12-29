@@ -8,6 +8,9 @@ const axios = require('axios');
 const sha1 = require('sha1');
 const https = require('https');
 
+const hashFiles = require('hash-files');
+var sha1File = require('sha1-file');
+
 const app = express();
 const googlePhotoAlbums=[
   'Year2016', 
@@ -299,35 +302,30 @@ function fetchGooglePhotos() {
 
 
 // Program start
-// all return true
 let driveExists = fs.existsSync("d:/");
 console.log(driveExists);
-driveExists = fs.existsSync("d://");
-console.log(driveExists);
-driveExists = fs.existsSync("d:\\");
-console.log(driveExists);
 
-const dirContents = fs.readdirSync("d:/");
-console.log(dirContents);
+// d:\Complete\3_01\P3090001.JPG
+// E45BDC199A7DC16A842D176A5C9BA5766296BA0A
 
-// list all files
-// https://gist.github.com/kethinov/6658166
-// http://stackoverflow.com/questions/5827612/node-js-fs-readdir-recursive-directory-search
-
-dirContents.forEach( (dirContent) => {
-
-  let path = "d:/" + dirContent;
-  const isDir = fs.lstatSync(path).isDirectory()
-  const isFile = fs.lstatSync(path).isFile();
-  console.log(path, " ", isDir, " ", isFile);
-  // let fd = fs.openSync("d:/" + dirContent, 'r');
-  // console.log(fd);
-});
+// test sha1
+// photoFile = 'd://Complete//3_01//P3090001.JPG';
+// const hash = sha1File(photoFile);
+// console.log(hash);
 
 nodeDir.files("d:/", function(err, files) {
-    if (err) throw err;
-    files = files.filter(isPhotoFile);
-    console.log(files);
+  if (err) throw err;
+  files = files.filter(isPhotoFile);
+  let photoFile = files[0];
+  console.log(photoFile);
+
+  const hash = sha1File(photoFile);
+  console.log(hash);
+
+  files.forEach( (photoFile) => {
+    const hash = sha1File(photoFile);
+    console.log(hash);
+  });
 });
 
 
