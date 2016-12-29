@@ -118,16 +118,19 @@ function parseGooglePhoto(photo) {
 
   const exifTags = photo['exif:tags'][0];
 
-  let timestamp;
+  let timestamp, ts;
+  let exifDateTime = "";
   const exifTimestamp = exifTags['exif:time'];
   if (exifTimestamp) {
     timestamp = photo['exif:tags'][0]['exif:time'][0];
+    exifDateTime = new Date();
+    ts = Number(timestamp);
+    exifDateTime.setTime(ts);
   }
-  else {
-    timestamp = photo['gphoto:timestamp'][0];
-  }
+
+  timestamp = photo['gphoto:timestamp'][0];
   let dateTime = new Date();
-  let ts = Number(timestamp);
+  ts = Number(timestamp);
   dateTime.setTime(ts);
 
   let imageUniqueId = '';
@@ -144,6 +147,7 @@ function parseGooglePhoto(photo) {
     height,
     timestamp,
     dateTime,
+    exifDateTime,
     imageUniqueId
   };
 }
@@ -225,21 +229,6 @@ function fetchGooglePhotos() {
   });
 }
 
-// how to match photo's
-//  d:\Complete\3_01\P3090001.JPG
-//    ignore exif info as that can't be relied on
-//    resolution: matches
-//    filename: matches
-//    exif info if available
-
-
-// Program start
-// let driveExists = fs.existsSync("d:/");
-// console.log(driveExists);
-
-
-
-
 function readGooglePhotoFiles(path) {
   return new Promise( (resolve, reject) => {
     fs.readFile(path, (err, data) => {
@@ -255,11 +244,6 @@ function readGooglePhotoFiles(path) {
 
 
 
-
-// const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
-// const existingPhotosSpec = JSON.parse(existingPhotosStr);
-// const existingGooglePhotos = existingPhotosSpec.photos;
-// console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
 
 // // initialize allGooglePhotos and photosById with existing photos
 // let allGooglePhotos = {};
@@ -317,7 +301,32 @@ function readGooglePhotoFiles(path) {
 // });
 
 
+function findMissingFiles(existingGooglePhotos) {
 
+  let photosByKey = {};
+  existingGooglePhotos.forEach( (photo) => {
+      const key = photo.name + '-' + photo.width + photo.height;
+      if (photosByKey[key]) {
+
+        console.log("existingPhoto: ");
+        console.log(photosByKey[key]);
+
+        console.log("new photo: ");
+        console.log(photo);
+        // debugger;
+      }
+      else {
+        photosByKey[key] = photo;
+      }
+  });
+  debugger;
+
+  let driveExists = fs.existsSync("d:/");
+  console.log(driveExists);
+
+}
+
+// Program start
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
@@ -328,6 +337,9 @@ promise.then((existingPhotosStr) => {
   const existingPhotosSpec = JSON.parse(existingPhotosStr);
   existingGooglePhotos = existingPhotosSpec.photos;
   console.log("Number of existing google photos: ", existingGooglePhotos.length);
+
+  // findMissingFiles(existingGooglePhotos);
+
 }, (reason) => {
   console.log('Error reading allGooglePhotos.json: ');
 });
@@ -342,7 +354,7 @@ if (fetchingGooglePhotos) {
     let allGooglePhotos = addedGooglePhotos;
 
     let allGooglePhotosSpec = {};
-    allGooglePhotosSpec.version = 2;
+    allGooglePhotosSpec.version = 3;
     allGooglePhotosSpec.photos = allGooglePhotos;
 
     // store google photo information in a file
