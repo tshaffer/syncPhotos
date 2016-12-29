@@ -13,20 +13,21 @@ var sha1File = require('sha1-file');
 
 const app = express();
 const googlePhotoAlbums=[
-  'Year2016', 
-  'Year2015',
-  'Year2014',
-  'Year2013',
-  'Year2012',
-  'Year2008',
-  'Year2007',
-  'Year2006',
-  'Year2005',
-  'Year2004',
-  'Year2003',
-  'Year2002',
-  'Year2000',
-  'YearPre2000'
+  // 'Year2016', 
+  // 'Year2015',
+  // 'Year2014',
+  // 'Year2013',
+  // 'Year2012',
+  // 'Year2008',
+  // 'Year2007',
+  // 'Year2006',
+  // 'Year2005',
+  // 'Year2004',
+  // 'Year2003',
+  // 'Year2002',
+  'Year2001'
+  // 'Year2000',
+  // 'YearPre2000'
   ];
 
 const photoFileExtensions=[
@@ -300,6 +301,15 @@ function fetchGooglePhotos() {
   });
 }
 
+// how to match photo's
+//  d:\Complete\3_01\P3090001.JPG
+//    ignore exif info as that can't be relied on
+//    resolution: matches
+//    filename: matches
+//    dates
+//      google photos dates: 3/9/2001 (in UI)
+//      disk dates: 3/13/2001
+
 
 // Program start
 let driveExists = fs.existsSync("d:/");
@@ -313,76 +323,76 @@ console.log(driveExists);
 // const hash = sha1File(photoFile);
 // console.log(hash);
 
-nodeDir.files("d:/", function(err, files) {
-  if (err) throw err;
-  files = files.filter(isPhotoFile);
-  let photoFile = files[0];
-  console.log(photoFile);
+// nodeDir.files("d:/", function(err, files) {
+//   if (err) throw err;
+//   files = files.filter(isPhotoFile);
+//   let photoFile = files[0];
+//   console.log(photoFile);
 
-  const hash = sha1File(photoFile);
-  console.log(hash);
+//   const hash = sha1File(photoFile);
+//   console.log(hash);
 
-  files.forEach( (photoFile) => {
-    const hash = sha1File(photoFile);
-    console.log(hash);
-  });
-});
-
-
-
-
-
-
-
-
-// console.log("syncPhotos - start");
-// console.log("__dirname: ", __dirname);
-
-// console.log("Read existing google photos");
-// const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
-// const existingPhotosSpec = JSON.parse(existingPhotosStr);
-// const existingGooglePhotos = existingPhotosSpec.photos;
-// console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
-
-// // initialize allGooglePhotos and photosById with existing photos
-// let allGooglePhotos = {};
-// allGooglePhotos.version = 1;
-// allGooglePhotos.photos = {};
-
-// // populate with existing photos
-// for (let sha1 in existingGooglePhotos) {
-//   if (existingGooglePhotos.hasOwnProperty(sha1)) {
-//     const existingGooglePhoto = existingGooglePhotos[sha1];
-//     allGooglePhotos.photos[sha1] = existingGooglePhoto;
-//     photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
-//   }
-// }
-
-// console.log("Number of photos in photosById: ", Object.keys(photosById).length);
-
-
-
-
-
-
-// fetchGooglePhotos().then( (addedGooglePhotos) => {
-  
-//   console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
-
-//   // merge new photos
-//   for (let sha1 in addedGooglePhotos) {
-//     if (addedGooglePhotos.hasOwnProperty(sha1)) {
-//       allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
-//     }
-//   }
-
-//   // store google photo information in a file
-//   const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
-//   fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
-//   console.log('Google photos reference file generation complete.');
-// }, (reason) => {
-//   console.log("fetchGooglePhotos failed: ", reason);
+//   files.forEach( (photoFile) => {
+//     const hash = sha1File(photoFile);
+//     console.log(hash);
+//   });
 // });
+
+
+
+
+
+
+
+
+console.log("syncPhotos - start");
+console.log("__dirname: ", __dirname);
+
+console.log("Read existing google photos");
+const existingPhotosStr = fs.readFileSync("allGooglePhotos.json");
+const existingPhotosSpec = JSON.parse(existingPhotosStr);
+const existingGooglePhotos = existingPhotosSpec.photos;
+console.log("Number of existing google photos: ", Object.keys(existingGooglePhotos).length);
+
+// initialize allGooglePhotos and photosById with existing photos
+let allGooglePhotos = {};
+allGooglePhotos.version = 1;
+allGooglePhotos.photos = {};
+
+// populate with existing photos
+for (let sha1 in existingGooglePhotos) {
+  if (existingGooglePhotos.hasOwnProperty(sha1)) {
+    const existingGooglePhoto = existingGooglePhotos[sha1];
+    allGooglePhotos.photos[sha1] = existingGooglePhoto;
+    photosById[existingGooglePhoto.photoId] = existingGooglePhoto;
+  }
+}
+
+console.log("Number of photos in photosById: ", Object.keys(photosById).length);
+
+
+
+
+
+
+fetchGooglePhotos().then( (addedGooglePhotos) => {
+  
+  console.log("Number of photos retrieved from google: ", Object.keys(addedGooglePhotos).length);
+
+  // merge new photos
+  for (let sha1 in addedGooglePhotos) {
+    if (addedGooglePhotos.hasOwnProperty(sha1)) {
+      allGooglePhotos.photos[sha1] = addedGooglePhotos[sha1];
+    }
+  }
+
+  // store google photo information in a file
+  const allGooglePhotosStr = JSON.stringify(allGooglePhotos, null, 2);
+  fs.writeFileSync('allGooglePhotos.json', allGooglePhotosStr);
+  console.log('Google photos reference file generation complete.');
+}, (reason) => {
+  console.log("fetchGooglePhotos failed: ", reason);
+});
 
 // http://stackoverflow.com/questions/36094026/unable-to-read-from-console-in-node-js-using-vs-code
 // https://code.visualstudio.com/Docs/editor/debugging
