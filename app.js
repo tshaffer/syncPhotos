@@ -172,6 +172,16 @@ function getFileExtension(fileName) {
   return fileName.split('.').pop();
 }
 
+function isJpegFile(fileName) {
+  const ext = getFileExtension(fileName.toLowerCase());
+  if ( (['jpg'].indexOf(ext)) >= 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 function isPhotoFile(fileName) {
   const ext = getFileExtension(fileName.toLowerCase());
   if ( (photoFileExtensions.indexOf(ext)) >= 0) {
@@ -297,39 +307,21 @@ function buildPhotoDictionaries() {
   });
 }
 
-var ImageFile = require('image-file');
-
-function toArrayBuffer(buf) {
-    var ab = new ArrayBuffer(buf.length);
-    var view = new Uint8Array(ab);
-    for (var i = 0; i < buf.length; ++i) {
-        view[i] = buf[i];
-    }
-    return ab;
-}
-
-function toBuffer(ab) {
-    var buf = new Buffer(ab.byteLength);
-    var view = new Uint8Array(ab);
-    for (var i = 0; i < buf.length; ++i) {
-        buf[i] = view[i];
-    }
-    return buf;
-}
-
+// key in photosByKey
+// 'IMG_1038.JPG-30244032'
+//  <name>-<width><height>
 function findFile(photoFile) {
 
-  if (photoFile.endsWith('Apr_98_Joel_BDay\\15.jpg')) {
-    console.log(photoFile);
+  // if (photoFile.endsWith('Apr_98_Joel_BDay\\15.jpg')) {
+  //   console.log(photoFile);
 
-    var jpegData = fs.readFileSync(photoFile);
-    var rawImageData = jpegJS.decode(jpegData);
-    console.log('rawImageData');
-    console.log(rawImageData.width);
-    console.log(rawImageData.height);
-    debugger;
-
-  }
+  //   var jpegData = fs.readFileSync(photoFile);
+  //   var rawImageData = jpegJS.decode(jpegData);
+  //   console.log('rawImageData');
+  //   console.log(rawImageData.width);
+  //   console.log(rawImageData.height);
+  //   debugger;
+  // }
 
   let searchResult = {};
   searchResult.file = photoFile;
@@ -338,9 +330,38 @@ function findFile(photoFile) {
     try {
       new exifImage({ image : photoFile }, function (error, exifData) {
         if (error || !exifData || !exifData.exif || !exifData.exif.CreateDate) {
-          searchResult.success = false;
-          searchResult.reason = "noExif";
-          searchResult.error = error;
+
+          // no exif date - search in photosByKey if it's a jpeg file
+          if (isJpegFile(photoFile)) {
+            const name = path.basename(photoFile);
+            // console.log('jpegJS.decode on: ', photoFile);
+            const jpegData = fs.readFileSync(photoFile);
+            try {
+              const rawImageData = jpegJS.decode(jpegData);
+              const key = name + '-' + rawImageData.width.toString() + rawImageData.height.toString();
+              // console.log('key: ', key);
+              if (photosByKey[key]) {
+                searchResult.success = true;
+                searchResult.reason = 'keyMatch';
+              }
+              else {
+                searchResult.success = false;
+                searchResult.reason = "noKeyMatch";
+                searchResult.error = error;
+              }
+            } catch (jpegJSError) {
+                searchResult.success = false;
+                searchResult.reason = "jpegJSError";
+                searchResult.error = error;
+                console.log('jpegJS error');
+            };
+          }
+          else {
+            searchResult.success = false;
+            searchResult.reason = "noExifNotJpg";
+            searchResult.error = error;
+          }
+
           resolve(searchResult);
         }
         else {
@@ -351,6 +372,7 @@ function findFile(photoFile) {
           // console.log("isoString: ", isoString);
           if (photosByExifDateTime[isoString]) {
             searchResult.success = true;
+            searchResult.reason = 'exifMatch';
           }
           else {
             // console.log(photoFile + ' match not found. Exif date/time: ', isoString);
@@ -386,47 +408,86 @@ function saveSearchResults(searchResults) {
   volumeResults.errorOther = [];
 
   let numMatchesFound = 0;
-  let numNoExif = 0;
-  let numNoMatch = 0;
-  let numOther = 0;
+  let numKeyMatches = 0;
+  let numNoKeyMatches = 0;
+  let numJpegJsErrors = 0;
+  let numNoExifNotJpgs = 0;
+  let numExifMatches = 0;
+  let numNoMatches = 0;
+  let numOthers = 0;
   
   searchResults.forEach( (searchResult) => {
+
     if (searchResult.success) {
       numMatchesFound++;
     }
-    else if (searchResult.reason === 'noExif') {
-      volumeResults.noExifFound.push({
-        file: searchResult.file
-      });
-      numNoExif++;
+    
+    switch(searchResult.reason) {
+      case 'keyMatch':
+        numKeyMatches++;
+        break;
+      case 'noKeyMatch':
+        numNoKeyMatches++;
+        break;
+      case 'jpegJSError':
+        numJpegJsErrors++;
+        break;
+      case 'noExifNotJpg':
+        numNoExifNotJpgs++;
+        break;
+      case 'exifMatch':
+        numExifMatches++;
+        break;
+      case 'noMatch':
+        numNoMatches++;
+        break;
+      case 'other':
+        numOthers++;
+        break;
     }
-    else if (searchResult.reason === 'noMatch') {
-      volumeResults.noMatchFound.push({
-        file: searchResult.file,
-        date: searchResult.isoString
-      });
-      numNoMatch++;
-    }
-    else {
-      volumeResults.errorOther.push({
-        file: searchResult.file,
-        error: searchResult.errorOther
-      });
-      numOther++;
-    }
+    // if (searchResult.reason === 'noExif') {
+    //   volumeResults.noExifFound.push({
+    //     file: searchResult.file
+    //   });
+    //   numNoExif++;
+    // }
+    // else if (searchResult.reason === 'noMatch') {
+    //   volumeResults.noMatchFound.push({
+    //     file: searchResult.file,
+    //     date: searchResult.isoString
+    //   });
+    //   numNoMatch++;
+    // }
+    // else {
+    //   volumeResults.errorOther.push({
+    //     file: searchResult.file,
+    //     error: searchResult.errorOther
+    //   });
+    //   numOther++;
+    // }
   });
-  console.log("Matches found: ", numMatchesFound);
-  console.log("No match: ", numNoMatch);
-  console.log("No exif: ", numNoExif);
-  console.log("Errors - other: ", numOther);
+
+  console.log('Total number of matches: ', numMatchesFound);
+  console.log('numExifMatches', numExifMatches);
+  console.log('numKeyMatches:', numKeyMatches);
+  console.log('numNoMatches', numNoMatches);
+  console.log('numNoKeyMatches:',numNoKeyMatches);
+  console.log('numNoExifNotJpgs', numNoExifNotJpgs);
+  console.log('numJpegJsErrors:', numJpegJsErrors);
+  console.log('numOthers', numOthers);
+
+  // console.log("Matches found: ", numMatchesFound);
+  // console.log("No match: ", numNoMatch);
+  // console.log("No exif: ", numNoExif);
+  // console.log("Errors - other: ", numOther);
 
   // update data structure
-  allResults.lastUpdated = new Date().toLocaleDateString();
-  allResults.Volumes[volumeName] = volumeResults;
+  // allResults.lastUpdated = new Date().toLocaleDateString();
+  // allResults.Volumes[volumeName] = volumeResults;
 
-  // store search results in a file
-  const allResultsStr = JSON.stringify(allResults, null, 2);
-  fs.writeFileSync('searchResults.json', allResultsStr);
+  // // store search results in a file
+  // const allResultsStr = JSON.stringify(allResults, null, 2);
+  // fs.writeFileSync('searchResults.json', allResultsStr);
 
   debugger;
 }
