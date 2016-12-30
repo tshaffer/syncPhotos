@@ -53,7 +53,8 @@ const fetchingGooglePhotos = false;
 let photosById = {};
 let photosByKey = {};
 let photosByExifDateTime = {};
-
+let existingGooglePhotos = [];
+let existingPhotosSpec;
 
 // return a list of albumIds for the albums referenced above
 function parseAlbums(albums) {
@@ -300,59 +301,43 @@ let photosNotFound;
 
 function findFile(photosByExifDateTime) {
 
-  const photoFile = photosFound[photosFoundIndex];
-
-  try {
+    const photoFile = photosFound[photosFoundIndex];
+    try {
       new exifImage({ image : photoFile }, function (error, exifData) {
-          if (error) {
-              console.log("num photos found: ", photosFoundWithExifDateTime);
-              console.log("num photos not found: ", photosNotFound);
-              console.log('Error: '+error.message);
-              photosNotFound++;
-              photosFoundIndex++;
-              if (photosFoundIndex >= photosFound.length) {
-                console.log("photo search complete");
-                console.log("num photos found: ", photosFoundWithExifDateTime);
-                console.log("num photos not found: ", photosNotFound);
-                return;
-              }
-              findFile(photosByExifDateTime);
+        if (error) {
+          photosNotFound++;
+          photosFoundIndex++;
+          if (photosFoundIndex >= photosFound.length) {
+            return;
+          }
+          findFile(photosByExifDateTime);
+        }
+        else {
+          const dateTimeStr = exifData.exif.CreateDate;
+          const exifDateTime = getDateFromString(dateTimeStr);
+          const isoString = exifDateTime.toISOString();
+          console.log("isoString: ", isoString);
+          if (photosByExifDateTime[isoString]) {
+            photosFoundWithExifDateTime++;
           }
           else {
-              const dateTimeStr = exifData.exif.CreateDate;
-              const exifDateTime = getDateFromString(dateTimeStr);
-              const isoString = exifDateTime.toISOString();
-              console.log("isoString: ", isoString);
-              if (photosByExifDateTime[isoString]) {
-                photosFoundWithExifDateTime++;
-              }
-              else {
-                console.log(photoFile + ' match not found. Exif date/time: ', isoString);
-                photosNotFound++;
-              }
-            }
-            photosFoundIndex++;
-            if (photosFoundIndex >= photosFound.length) {
-              console.log("photo search complete");
-              console.log("num photos found: ", photosFoundWithExifDateTime);
-              console.log("num photos not found: ", photosNotFound);
-              return;
-            }
-            findFile(photosByExifDateTime);
+            console.log(photoFile + ' match not found. Exif date/time: ', isoString);
+            photosNotFound++;
+          }
+        }
+        photosFoundIndex++;
+        if (photosFoundIndex >= photosFound.length) {
+          return;
+        }
+        findFile(photosByExifDateTime);
       });
-  } catch (error) {
-    console.log("num photos found: ", photosFoundWithExifDateTime);
-    console.log("num photos not found: ", photosNotFound);
-    console.log('Error: '+error.message);
-    photosFoundIndex++;
-    if (photosFoundIndex >= photosFound.length) {
-      console.log("photo search complete");
-      console.log("num photos found: ", photosFoundWithExifDateTime);
-      console.log("num photos not found: ", photosNotFound);
-      return;
+    } catch (error) {
+      photosFoundIndex++;
+      if (photosFoundIndex >= photosFound.length) {
+        return;
+      }
+      findFile(photosByExifDateTime);
     }
-    findFile(photosByExifDateTime);
-  }
 }
 
 function findMissingFiles() {
@@ -368,6 +353,9 @@ function findMissingFiles() {
     photosFoundWithExifDateTime = 0;
     photosNotFound = 0;
     findFile(photosByExifDateTime);
+    console.log("photo search complete");
+    console.log("num photos found: ", photosFoundWithExifDateTime);
+    console.log("num photos not found: ", photosNotFound);
   });
 }
 
@@ -382,8 +370,6 @@ function getDateFromString(dateTimeStr) {
   return dateTime;
 }
 
-let existingGooglePhotos = [];
-let existingPhotosSpec;
 
 // Program start
 console.log("syncPhotos - start");
