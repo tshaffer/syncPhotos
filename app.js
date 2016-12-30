@@ -560,27 +560,24 @@ function matchFiles() {
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
-volumeName = "poo";
-matchFiles();
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// });
+rl.question('Enter the volume name: ', (vName) => {
 
-// rl.question('Enter the volume name: ', (vName) => {
+  rl.close();
 
-//   rl.close();
+  console.log("volumeName is: ", vName);
 
-//   console.log("volumeName is: ", vName);
+  volumeName = vName;
 
-//   volumeName = vName;
+  matchFiles();
 
-//   matchFiles();
-
-//   if (fetchingGooglePhotos) {
-//     runFetchGooglePhotos();
-//   }
-// });
+  if (fetchingGooglePhotos) {
+    runFetchGooglePhotos();
+  }
+});
 
 
