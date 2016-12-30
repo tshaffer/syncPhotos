@@ -338,41 +338,62 @@ function findFile(photoFile) {
 
 function saveSearchResults(searchResults) {
 
-  let results = {};
-  results.volume = volumeName;
-  results.noExifFound = [];
-  results.noMatchFound = [];
-  results.errorOther = [];
+  // must use async version if file doesn't exist
+  // const existingResultsStr = fs.readFileSync('searchResults.json');
+  // let allResults = JSON.parse(existingResultsStr);
+
+  // first time initialization
+  let allResults = {};
+  allResults.Volumes = {};
+
+  // build results based on this search
+  let volumeResults = {};
+  volumeResults.noExifFound = [];
+  volumeResults.noMatchFound = [];
+  volumeResults.errorOther = [];
 
   let numMatchesFound = 0;
+  let numNoExif = 0;
+  let numNoMatch = 0;
+  let numOther = 0;
   
   searchResults.forEach( (searchResult) => {
     if (searchResult.success) {
       numMatchesFound++;
     }
     else if (searchResult.reason === 'noExif') {
-      results.noExifFound.push({
+      volumeResults.noExifFound.push({
         file: searchResult.file
       });
+      numNoExif++;
     }
     else if (searchResult.reason === 'noMatch') {
-      results.noMatchFound.push({
+      volumeResults.noMatchFound.push({
         file: searchResult.file,
         date: searchResult.isoString
       });
+      numNoMatch++;
     }
     else {
-      results.errorOther.push({
+      volumeResults.errorOther.push({
         file: searchResult.file,
         error: searchResult.errorOther
       });
+      numOther++;
     }
   });
-  console.log("Number of matches found: ", numMatchesFound);
+  console.log("Matches found: ", numMatchesFound);
+  console.log("No match: ", numNoMatch);
+  console.log("No exif: ", numNoExif);
+  console.log("Errors - other: ", numOther);
+
+  // update data structure
+  allResults.lastUpdated = new Date().toLocaleDateString();
+  allResults.Volumes[volumeName] = volumeResults;
 
   // store search results in a file
-  const resultsStr = JSON.stringify(results, null, 2);
-  fs.writeFileSync('searchResults.json', resultsStr);
+  const allResultsStr = JSON.stringify(allResults, null, 2);
+  fs.writeFileSync('searchResults.json', allResultsStr);
 
   debugger;
 }
@@ -385,7 +406,7 @@ function findMissingFiles() {
     if (err) throw err;
     files = files.filter(isPhotoFile);
 
-    console.log("total number of photos on drive: ", files.length);
+    console.log("Photos on drive: ", files.length);
 
     let promises = [];
     files.forEach( (file) => {
