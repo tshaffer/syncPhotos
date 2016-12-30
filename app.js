@@ -294,21 +294,7 @@ function buildPhotoDictionaries() {
   });
 }
 
-let photosFound;
-let photosFoundIndex;
-let photosFoundWithExifDateTime;
-let photosNotFound;
-
-function photoMatchingComplete() {
-    console.log("photo search complete");
-    // console.log("num photos found: ", photosFoundWithExifDateTime);
-    // console.log("num photos not found: ", photosNotFound);
-    console.log("photosFoundIndex: ", photosFoundIndex);
-    console.log("total number of photos: ", photosFound.length);
-    debugger;
-}
-
-function newFindFile(photoFile) {
+function findFile(photoFile) {
 
   let searchResult = {};
   searchResult.file = photoFile;
@@ -329,7 +315,6 @@ function newFindFile(photoFile) {
           searchResult.isoString = isoString;
           // console.log("isoString: ", isoString);
           if (photosByExifDateTime[isoString]) {
-            photosFoundWithExifDateTime++;
             searchResult.success = true;
           }
           else {
@@ -348,57 +333,6 @@ function newFindFile(photoFile) {
   });
 }
 
-function findFile() {
-
-    const photoFile = photosFound[photosFoundIndex];
-    if (photosFoundIndex >= photosFound.length) {
-      debugger;
-    }
-
-    try {
-      new exifImage({ image : photoFile }, function (error, exifData) {
-        if (error) {
-          photosNotFound++;
-          photosFoundIndex++;
-          if (photosFoundIndex >= photosFound.length) {
-            photoMatchingComplete();
-          }
-          else {
-            findFile();
-          }
-        }
-        else {
-          const dateTimeStr = exifData.exif.CreateDate;
-          const exifDateTime = getDateFromString(dateTimeStr);
-          const isoString = exifDateTime.toISOString();
-          console.log("isoString: ", isoString);
-          if (photosByExifDateTime[isoString]) {
-            photosFoundWithExifDateTime++;
-          }
-          else {
-            console.log(photoFile + ' match not found. Exif date/time: ', isoString);
-            photosNotFound++;
-          }
-        }
-        photosFoundIndex++;
-        if (photosFoundIndex >= photosFound.length) {
-            photoMatchingComplete();
-        }
-        else {
-          findFile();
-        }
-      });
-    } catch (error) {
-      photosFoundIndex++;
-      if (photosFoundIndex >= photosFound.length) {
-            photoMatchingComplete();
-      }
-      else {
-        findFile();
-      }
-    }
-}
-
 function findMissingFiles() {
 
   buildPhotoDictionaries();
@@ -407,17 +341,11 @@ function findMissingFiles() {
     if (err) throw err;
     files = files.filter(isPhotoFile);
 
-    photosFoundIndex = 0;
-    photosFound = files;
-    photosFoundWithExifDateTime = 0;
-    photosNotFound = 0;
+    console.log("total number of photos on drive: ", files.length);
 
-    console.log("total number of photos on drive: ", photosFound.length);
-
-    // findFile();
     let promises = [];
     files.forEach( (file) => {
-      promise = newFindFile(file);
+      promise = findFile(file);
       promises.push(promise);
     });
     Promise.all(promises).then( (searchResults) => {
