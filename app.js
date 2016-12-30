@@ -294,37 +294,52 @@ function buildPhotoDictionaries() {
 
     if (photo.exifDateTime && photo.exifDateTime !== '') {
       photosByExifDateTime[photo.exifDateTime] = photo;
-    }  
-    else {
-      const key = photo.name + '-' + photo.width + photo.height;
-      if (photosByKey[key]) {
-        numDuplicates++;
-      }
-      else {
-        photosByKey[key] = photo;
-      }
     }
+
+    const key = (photo.name + '-' + photo.width + photo.height).toLowerCase();
+    if (photosByKey[key]) {
+      numDuplicates++;
+    }
+    else {
+      photosByKey[key] = photo;
+    }
+
   });
+
+  // fs.writeFileSync('photosByKey.json', JSON.stringify(photosByKey, null, 2));
 }
 
-// key in photosByKey
-// 'IMG_1038.JPG-30244032'
-//  <name>-<width><height>
+function setSearchResult(photoFile, success, reason, error) {
+  return {
+    photoFile,
+    success,
+    reason,
+    error
+  };
+}
+
+function findPhotoByKey(photoFile) {
+  const name = path.basename(photoFile);
+  const jpegData = fs.readFileSync(photoFile);
+  try {
+    const rawImageData = jpegJS.decode(jpegData);
+    const key = (name + '-' + rawImageData.width.toString() + rawImageData.height.toString()).toLowerCase();
+    console.log('key: ', key);
+    if (photosByKey[key]) {
+      return setSearchResult(photoFile, true, 'keyMatch', '');
+    }
+    else {
+      return setSearchResult(photoFile, false, 'noKeyMatch', '');
+    }
+  } catch (jpegJSError) {
+    console.log('jpegJSError: ', photoFile);
+    return setSearchResult(photoFile, false, 'jpegJSError', jpegJSError);
+  };
+}
+
 function findFile(photoFile) {
 
-  // if (photoFile.endsWith('Apr_98_Joel_BDay\\15.jpg')) {
-  //   console.log(photoFile);
-
-  //   var jpegData = fs.readFileSync(photoFile);
-  //   var rawImageData = jpegJS.decode(jpegData);
-  //   console.log('rawImageData');
-  //   console.log(rawImageData.width);
-  //   console.log(rawImageData.height);
-  //   debugger;
-  // }
-
   let searchResult = {};
-  searchResult.file = photoFile;
 
   return new Promise( (resolve, reject) => {
     try {
@@ -333,59 +348,41 @@ function findFile(photoFile) {
 
           // no exif date - search in photosByKey if it's a jpeg file
           if (isJpegFile(photoFile)) {
-            const name = path.basename(photoFile);
-            // console.log('jpegJS.decode on: ', photoFile);
-            const jpegData = fs.readFileSync(photoFile);
-            try {
-              const rawImageData = jpegJS.decode(jpegData);
-              const key = name + '-' + rawImageData.width.toString() + rawImageData.height.toString();
-              // console.log('key: ', key);
-              if (photosByKey[key]) {
-                searchResult.success = true;
-                searchResult.reason = 'keyMatch';
-              }
-              else {
-                searchResult.success = false;
-                searchResult.reason = "noKeyMatch";
-                searchResult.error = error;
-              }
-            } catch (jpegJSError) {
-                searchResult.success = false;
-                searchResult.reason = "jpegJSError";
-                searchResult.error = error;
-                console.log('jpegJS error');
-            };
+            searchResult = findPhotoByKey(photoFile);
           }
           else {
-            searchResult.success = false;
-            searchResult.reason = "noExifNotJpg";
-            searchResult.error = error;
+            searchResult = setSearchResult(false, 'noExifNotJpg', error);
           }
-
           resolve(searchResult);
         }
         else {
           const dateTimeStr = exifData.exif.CreateDate;
           const exifDateTime = getDateFromString(dateTimeStr);
           const isoString = exifDateTime.toISOString();
-          searchResult.isoString = isoString;
-          // console.log("isoString: ", isoString);
           if (photosByExifDateTime[isoString]) {
-            searchResult.success = true;
-            searchResult.reason = 'exifMatch';
+            searchResult = setSearchResult(true, 'exifMatch', '');
           }
           else {
-            // console.log(photoFile + ' match not found. Exif date/time: ', isoString);
-            searchResult.success = false;
-            searchResult.reason = "noExifMatch";
+            // searchResult = setSearchResult(false, 'noExifMatch', '');
+            if (isJpegFile(photoFile)) {
+              // console.log('isoString: ', isoString);
+              // console.log('invoke findPhotoByKey on: ', photoFile);
+              searchResult = findPhotoByKey(photoFile);
+              // console.log(searchResult);
+              // if (!searchResult.success) {
+              //   debugger;
+              // }
+            }
+            else {
+              searchResult = setSearchResult(false, 'noExifMatch', '');
+            }
           }
+          searchResult.isoString = isoString;
           resolve(searchResult);
         }
       });
     } catch (error) {
-      searchResult.success = false;
-      searchResult.reason = 'other';
-      searchResult.error = error;
+      searchResult = setSearchResult(false, 'other', error);
       resolve(searchResult);
     }
   });
@@ -560,24 +557,28 @@ function matchFiles() {
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-rl.question('Enter the volume name: ', (vName) => {
-
-  rl.close();
-
-  console.log("volumeName is: ", vName);
-
-  volumeName = vName;
+  volumeName = "Photos5";
 
   matchFiles();
 
-  if (fetchingGooglePhotos) {
-    runFetchGooglePhotos();
-  }
-});
+// const rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout
+// });
+
+// rl.question('Enter the volume name: ', (vName) => {
+
+//   rl.close();
+
+//   console.log("volumeName is: ", vName);
+
+//   volumeName = vName;
+
+//   matchFiles();
+
+//   if (fetchingGooglePhotos) {
+//     runFetchGooglePhotos();
+//   }
+// });
 
 
