@@ -49,12 +49,14 @@ const photoFileExtensions=[
 ];
 
 // initialize 'global' variables
+// review which of these need to be 'global'
 const fetchingGooglePhotos = false;
-let photosById = {};
+let photosById = {};                      // unclear if this is really used
 let photosByKey = {};
 let photosByExifDateTime = {};
 let existingGooglePhotos = [];
 let existingPhotosSpec;
+let volumeName = "unknown";
 
 // return a list of albumIds for the albums referenced above
 function parseAlbums(albums) {
@@ -327,10 +329,52 @@ function findFile(photoFile) {
       });
     } catch (error) {
       searchResult.success = false;
+      searchResult.reason = 'other';
       searchResult.error = error;
       resolve(searchResult);
     }
   });
+}
+
+function saveSearchResults(searchResults) {
+
+  let results = {};
+  results.volume = volumeName;
+  results.noExifFound = [];
+  results.noMatchFound = [];
+  results.errorOther = [];
+
+  let numMatchesFound = 0;
+  
+  searchResults.forEach( (searchResult) => {
+    if (searchResult.success) {
+      numMatchesFound++;
+    }
+    else if (searchResult.reason === 'noExif') {
+      results.noExifFound.push({
+        file: searchResult.file
+      });
+    }
+    else if (searchResult.reason === 'noMatch') {
+      results.noMatchFound.push({
+        file: searchResult.file,
+        date: searchResult.isoString
+      });
+    }
+    else {
+      results.errorOther.push({
+        file: searchResult.file,
+        error: searchResult.errorOther
+      });
+    }
+  });
+  console.log("Number of matches found: ", numMatchesFound);
+
+  // store search results in a file
+  const resultsStr = JSON.stringify(results, null, 2);
+  fs.writeFileSync('searchResults.json', resultsStr);
+
+  debugger;
 }
 
 function findMissingFiles() {
@@ -349,15 +393,7 @@ function findMissingFiles() {
       promises.push(promise);
     });
     Promise.all(promises).then( (searchResults) => {
-      let numMatchesFound = 0;
-      searchResults.forEach( (result) => {
-        if (result.success) {
-          numMatchesFound++;
-        }
-      });
-      console.log("Number of matches found: ", numMatchesFound);
-
-      debugger;
+      saveSearchResults(searchResults);
     });
   });
 }
@@ -375,6 +411,7 @@ function getDateFromString(dateTimeStr) {
 
 
 function runFetchGooglePhotos() {
+
   fetchGooglePhotos().then( (addedGooglePhotos) => {
     
     console.log("Number of photos retrieved from google: ", addedGooglePhotos.length);
@@ -396,6 +433,7 @@ function runFetchGooglePhotos() {
 }
 
 function matchFiles() {
+
   console.log("Retrieve existing google photos");
   existingGooglePhotos = [];
   let promise = readGooglePhotoFiles('allGooglePhotos.json');
@@ -428,12 +466,13 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let volumeName = "unknown";
-rl.question('Enter the volume name: ', (volumeName) => {
+rl.question('Enter the volume name: ', (vName) => {
 
   rl.close();
 
-  console.log("volumeName is: ", volumeName);
+  console.log("volumeName is: ", vName);
+
+  volumeName = vName;
 
   matchFiles();
 
