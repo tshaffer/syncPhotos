@@ -16,6 +16,7 @@ const fs = require('fs');
 const readline = require('readline');
 const nodeDir = require('node-dir');
 const exifImage = require('exif').ExifImage;
+const jpegJS = require('jpeg-js');
 
 const express = require('express');
 const axios = require('axios');
@@ -296,11 +297,42 @@ function buildPhotoDictionaries() {
   });
 }
 
+var ImageFile = require('image-file');
+
+function toArrayBuffer(buf) {
+    var ab = new ArrayBuffer(buf.length);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        view[i] = buf[i];
+    }
+    return ab;
+}
+
+function toBuffer(ab) {
+    var buf = new Buffer(ab.byteLength);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        buf[i] = view[i];
+    }
+    return buf;
+}
+
 function findFile(photoFile) {
+
+  if (photoFile.endsWith('Apr_98_Joel_BDay\\15.jpg')) {
+    console.log(photoFile);
+
+    var jpegData = fs.readFileSync(photoFile);
+    var rawImageData = jpegJS.decode(jpegData);
+    console.log('rawImageData');
+    console.log(rawImageData.width);
+    console.log(rawImageData.height);
+    debugger;
+
+  }
 
   let searchResult = {};
   searchResult.file = photoFile;
-  
 
   return new Promise( (resolve, reject) => {
     try {
@@ -483,24 +515,27 @@ function matchFiles() {
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+volumeName = "poo";
+matchFiles();
 
-rl.question('Enter the volume name: ', (vName) => {
+// const rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout
+// });
 
-  rl.close();
+// rl.question('Enter the volume name: ', (vName) => {
 
-  console.log("volumeName is: ", vName);
+//   rl.close();
 
-  volumeName = vName;
+//   console.log("volumeName is: ", vName);
 
-  matchFiles();
+//   volumeName = vName;
 
-  if (fetchingGooglePhotos) {
-    runFetchGooglePhotos();
-  }
-});
+//   matchFiles();
+
+//   if (fetchingGooglePhotos) {
+//     runFetchGooglePhotos();
+//   }
+// });
 
 
