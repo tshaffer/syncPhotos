@@ -374,32 +374,7 @@ function getDateFromString(dateTimeStr) {
 }
 
 
-// Program start
-console.log("syncPhotos - start");
-console.log("__dirname: ", __dirname);
-
-console.log("Retrieve existing google photos");
-existingGooglePhotos = [];
-let promise = readGooglePhotoFiles('allGooglePhotos.json');
-promise.then((existingPhotosStr) => {
-  existingPhotosSpec = JSON.parse(existingPhotosStr);
-  existingGooglePhotos = existingPhotosSpec.photos;
-  console.log("Number of existing google photos: ", existingGooglePhotos.length);
-
-  existingGooglePhotos.forEach( (photo, index) => {
-    if (photo.exifDateTime !== '') {
-      photo.exifDateTime = photo.dateTime;
-    }
-  });
-
-  findMissingFiles();
-
-}, (reason) => {
-  console.log('Error reading allGooglePhotos.json: ');
-});
-
-if (fetchingGooglePhotos) {
-
+function runFetchGooglePhotos() {
   fetchGooglePhotos().then( (addedGooglePhotos) => {
     
     console.log("Number of photos retrieved from google: ", addedGooglePhotos.length);
@@ -419,3 +394,52 @@ if (fetchingGooglePhotos) {
     console.log("fetchGooglePhotos failed: ", reason);
   });
 }
+
+function matchFiles() {
+  console.log("Retrieve existing google photos");
+  existingGooglePhotos = [];
+  let promise = readGooglePhotoFiles('allGooglePhotos.json');
+  promise.then((existingPhotosStr) => {
+    existingPhotosSpec = JSON.parse(existingPhotosStr);
+    existingGooglePhotos = existingPhotosSpec.photos;
+    console.log("Number of existing google photos: ", existingGooglePhotos.length);
+
+    existingGooglePhotos.forEach( (photo, index) => {
+      if (photo.exifDateTime !== '') {
+        photo.exifDateTime = photo.dateTime;
+      }
+    });
+
+    findMissingFiles();
+
+  }, (reason) => {
+    console.log('Error reading allGooglePhotos.json: ');
+  });
+}
+
+
+
+// Program start
+console.log("syncPhotos - start");
+console.log("__dirname: ", __dirname);
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+let volumeName = "unknown";
+rl.question('Enter the volume name: ', (volumeName) => {
+
+  rl.close();
+
+  console.log("volumeName is: ", volumeName);
+
+  matchFiles();
+
+  if (fetchingGooglePhotos) {
+    runFetchGooglePhotos();
+  }
+});
+
+
