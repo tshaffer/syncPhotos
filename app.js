@@ -377,7 +377,7 @@ function findFile(photoFile) {
           else {
             // console.log(photoFile + ' match not found. Exif date/time: ', isoString);
             searchResult.success = false;
-            searchResult.reason = "noMatch";
+            searchResult.reason = "noExifMatch";
           }
           resolve(searchResult);
         }
@@ -393,27 +393,31 @@ function findFile(photoFile) {
 
 function saveSearchResults(searchResults) {
 
-  // must use async version if file doesn't exist
-  const existingResultsStr = fs.readFileSync('searchResults.json');
-  let allResults = JSON.parse(existingResultsStr);
+  // must use async version if file read failure is possible
+  // const existingResultsStr = fs.readFileSync('searchResults.json');
+  // let allResults = JSON.parse(existingResultsStr);
   
   // first time initialization
-  // let allResults = {};
-  // allResults.Volumes = {};
+  let allResults = {};
+  allResults.Volumes = {};
 
   // build results based on this search
   let volumeResults = {};
-  volumeResults.noExifFound = [];
-  volumeResults.noMatchFound = [];
+  volumeResults.noKeyMatch = [];
+  volumeResults.noExifMatch = [];
+  volumeResults.noExifNotJpg = [];
   volumeResults.errorOther = [];
 
   let numMatchesFound = 0;
-  let numKeyMatches = 0;
-  let numNoKeyMatches = 0;
-  let numJpegJsErrors = 0;
-  let numNoExifNotJpgs = 0;
+
   let numExifMatches = 0;
-  let numNoMatches = 0;
+  let numKeyMatches = 0;
+
+  let numNoKeyMatches = 0;
+  let numNoExifMatches = 0;
+  let numNoExifNotJpgs = 0;
+
+  let numJpegJsErrors = 0;
   let numOthers = 0;
   
   searchResults.forEach( (searchResult) => {
@@ -423,71 +427,51 @@ function saveSearchResults(searchResults) {
     }
     
     switch(searchResult.reason) {
+      case 'exifMatch':
+        numExifMatches++;
+        break;
       case 'keyMatch':
         numKeyMatches++;
         break;
       case 'noKeyMatch':
+        volumeResults.noKeyMatch.push({file: searchResult.file});
         numNoKeyMatches++;
         break;
-      case 'jpegJSError':
-        numJpegJsErrors++;
+      case 'noExifMatch':
+        volumeResults.noExifMatch.push({file: searchResult.file});
+        numNoExifMatches++;
         break;
       case 'noExifNotJpg':
+        volumeResults.noExifNotJpg.push({file: searchResult.file});
         numNoExifNotJpgs++;
         break;
-      case 'exifMatch':
-        numExifMatches++;
-        break;
-      case 'noMatch':
-        numNoMatches++;
+      case 'jpegJSError':
+        volumeResults.errorOther.push({file: searchResult.file});
+        numJpegJsErrors++;
         break;
       case 'other':
+        volumeResults.errorOther.push({file: searchResult.file});
         numOthers++;
         break;
     }
-    // if (searchResult.reason === 'noExif') {
-    //   volumeResults.noExifFound.push({
-    //     file: searchResult.file
-    //   });
-    //   numNoExif++;
-    // }
-    // else if (searchResult.reason === 'noMatch') {
-    //   volumeResults.noMatchFound.push({
-    //     file: searchResult.file,
-    //     date: searchResult.isoString
-    //   });
-    //   numNoMatch++;
-    // }
-    // else {
-    //   volumeResults.errorOther.push({
-    //     file: searchResult.file,
-    //     error: searchResult.errorOther
-    //   });
-    //   numOther++;
-    // }
   });
 
   console.log('Total number of matches: ', numMatchesFound);
   console.log('numExifMatches', numExifMatches);
   console.log('numKeyMatches:', numKeyMatches);
-  console.log('numNoMatches', numNoMatches);
+  console.log('numNoExifMatches', numNoExifMatches);
   console.log('numNoKeyMatches:',numNoKeyMatches);
   console.log('numNoExifNotJpgs', numNoExifNotJpgs);
   console.log('numJpegJsErrors:', numJpegJsErrors);
   console.log('numOthers', numOthers);
 
-  // console.log("Matches found: ", numMatchesFound);
-  // console.log("No match: ", numNoMatch);
-  // console.log("No exif: ", numNoExif);
-  // console.log("Errors - other: ", numOther);
-
   // update data structure
-  // allResults.lastUpdated = new Date().toLocaleDateString();
-  // allResults.Volumes[volumeName] = volumeResults;
+  allResults.lastUpdated = new Date().toLocaleDateString();
+  allResults.Volumes[volumeName] = volumeResults;
 
   // // store search results in a file
-  // const allResultsStr = JSON.stringify(allResults, null, 2);
-  // fs.writeFileSync('searchResults.json', allResultsStr);
+  const allResultsStr = JSON.stringify(allResults, null, 2);
+  fs.writeFileSync('searchResults.json', allResultsStr);
 
   debugger;
 }

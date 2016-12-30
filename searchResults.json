@@ -1,311 +1,981 @@
 {
   "Volumes": {
-    "Photos5": {
-      "noExifFound": [
+    "PHOTOS4": {
+      "noKeyMatch": [
         {
-          "file": "d:\\Complete\\3_01\\P3170012.JPG"
+          "file": "d:\\closeIcon.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180004.JPG"
+          "file": "d:\\cropIcon.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180005.JPG"
+          "file": "d:\\imageAdjustIcon.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180006.JPG"
+          "file": "d:\\JoelIcon.jpg"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180007.JPG"
+          "file": "d:\\JPEGTest.jpg"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180010.JPG"
+          "file": "d:\\RachelIcon.jpg"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180011.JPG"
+          "file": "d:\\rotateIcon.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180015.JPG"
+          "file": "d:\\SamIcon.jpg"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180018.JPG"
+          "file": "d:\\saveIcon.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180021.JPG"
+          "file": "d:\\undoRedoIcon.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180019.JPG"
+          "file": "d:\\Complete\\Dec_99_2\\AGF00007.JPG"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180022.JPG"
+          "file": "d:\\Complete\\Feb_98_02\\00.jpg"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180008.jpg"
+          "file": "d:\\Complete\\Feb_98_02\\01.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\02.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\03.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\04.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\05.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\06.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\07.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\08.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\09.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\10.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\11.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\12.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\13.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\14.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\15.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\16.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\17.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\18.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\19.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\20.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\21.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\22.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\23.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\24.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\25.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\26.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_02\\27.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\00.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\01.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\02.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\03.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\04.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\05.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\06.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\07.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\08.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\09.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\10.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\11.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\12.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\13.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\14.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\15.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\16.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\17.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\18.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_03\\19.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\00.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\01.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\02.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\03.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\04.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\05.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\06.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\07.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\08.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\09.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\10.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\11.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\12.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\13.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\14.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\15.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\16.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\17.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\18.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\19.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\20.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\21.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\22.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\23.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\24.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\25.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\26.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Feb_98_01\\27.jpg"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_6\\AGF00004.JPG"
+        },
+        {
+          "file": "d:\\Raw\\Ongoing2\\AGF00019.jpg"
+        },
+        {
+          "file": "d:\\Raw\\Ongoing5\\AGF00002.JPG"
+        },
+        {
+          "file": "d:\\Raw\\Ongoing5\\AGF00008.JPG"
+        },
+        {
+          "file": "d:\\JPEG\\jpeg-6b\\jeff.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\jpeg-6b\\testimg.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\jpeg-6b\\testimgp.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\jpeg-6b\\testorig.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\jpeg-6b\\testprog.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\jpeg-6b\\djpeg\\Release\\jeff.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\guido-crop\\2.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\guido-crop\\3.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\guido-crop\\4.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\guido-crop\\5.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg-6b\\testimg.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg-6b\\testimgp.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg-6b\\testorig.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg-6b\\testprog.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg6b-new\\jpeg-6b\\testimg.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg6b-new\\jpeg-6b\\testimgp.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg6b-new\\jpeg-6b\\testorig.jpg"
+        },
+        {
+          "file": "d:\\JPEG\\src\\jpeg6b-new\\jpeg-6b\\testprog.jpg"
         }
       ],
-      "noMatchFound": [
+      "noExifMatch": [],
+      "noExifNotJpg": [
         {
-          "file": "d:\\Complete\\2_01\\P2200709.JPG",
-          "date": "2001-02-21T04:16:29.000Z"
+          "file": "d:\\buttons1.tif"
         },
         {
-          "file": "d:\\Complete\\2_01\\P2200710.JPG",
-          "date": "2001-02-21T04:17:11.000Z"
+          "file": "d:\\buttons2.TIF"
         },
         {
-          "file": "d:\\Complete\\2_01\\P1010712.JPG",
-          "date": "1899-11-30T08:00:00.000Z"
+          "file": "d:\\buttons3.TIF"
         },
         {
-          "file": "d:\\Complete\\2_01\\P1010713.JPG",
-          "date": "1899-11-30T08:00:00.000Z"
+          "file": "d:\\buttons4.TIF"
         },
         {
-          "file": "d:\\Complete\\2_01\\P1010714.JPG",
-          "date": "1899-11-30T08:00:00.000Z"
+          "file": "d:\\buttons5.TIF"
         },
         {
-          "file": "d:\\Complete\\2_01\\P1010715.JPG",
-          "date": "1899-11-30T08:00:00.000Z"
+          "file": "d:\\closeIcon.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170001.JPG",
-          "date": "2001-03-17T17:48:57.000Z"
+          "file": "d:\\cropIcon.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170003.JPG",
-          "date": "2001-03-17T17:51:53.000Z"
+          "file": "d:\\imageAdjustIcon.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170004.JPG",
-          "date": "2001-03-17T17:53:18.000Z"
+          "file": "d:\\rotateIcon.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170005.JPG",
-          "date": "2001-03-17T17:54:43.000Z"
+          "file": "d:\\saveIcon.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170002.JPG",
-          "date": "2001-03-17T17:50:05.000Z"
+          "file": "d:\\undoRedoIcon.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170006.JPG",
-          "date": "2001-03-17T18:04:56.000Z"
+          "file": "d:\\PhotoArchives\\Apr_98_Joel_BDay_15.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170007.JPG",
-          "date": "2001-03-17T18:05:49.000Z"
+          "file": "d:\\PhotoArchives\\Apr_98_21.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170008.JPG",
-          "date": "2001-03-17T18:05:59.000Z"
+          "file": "d:\\PhotoArchives\\Apr_98_Joel_BDay_03.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170010.JPG",
-          "date": "2001-03-17T18:06:34.000Z"
+          "file": "d:\\PhotoArchives\\Apr_98_Joel_BDay_12.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3170009.JPG",
-          "date": "2001-03-17T18:06:21.000Z"
+          "file": "d:\\PhotoArchives\\Apr_98_Joel_BDay_13.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180001.JPG",
-          "date": "2001-03-18T19:35:19.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_03.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180002.JPG",
-          "date": "2001-03-18T19:36:02.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_10.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180009.JPG",
-          "date": "2001-03-18T20:51:29.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_17.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180003.JPG",
-          "date": "2001-03-18T19:36:31.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_20.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180012.JPG",
-          "date": "2001-03-18T21:05:12.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_22.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180014.JPG",
-          "date": "2001-03-18T21:05:47.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_23.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180016.JPG",
-          "date": "2001-03-18T21:06:06.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_26.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180017.JPG",
-          "date": "2001-03-18T21:08:28.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_01_27.TIF"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180020.JPG",
-          "date": "2001-03-18T21:43:52.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_02_20.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180023.JPG",
-          "date": "2001-03-18T21:58:49.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_02_21.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180024.JPG",
-          "date": "2001-03-18T21:58:56.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_03_02.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3230001.JPG",
-          "date": "2001-03-24T00:52:42.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_03_15.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3230002.JPG",
-          "date": "2001-03-24T00:52:57.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_03.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3180025.JPG",
-          "date": "2001-03-18T21:59:20.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_06.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3230004.JPG",
-          "date": "2001-03-24T00:53:35.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_07.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3230005.JPG",
-          "date": "2001-03-24T00:53:43.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_09.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3240006.JPG",
-          "date": "2001-03-24T16:48:40.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_10.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3240008.JPG",
-          "date": "2001-03-24T16:49:48.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_15.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3240007.JPG",
-          "date": "2001-03-24T16:48:58.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_16.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3240009.JPG",
-          "date": "2001-03-24T16:51:00.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_17.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3240010.JPG",
-          "date": "2001-03-24T16:52:11.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_20.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3240011.JPG",
-          "date": "2001-03-24T17:00:43.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_25.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3300002.JPG",
-          "date": "2001-03-30T14:38:21.000Z"
+          "file": "d:\\PhotoArchives\\Feb_98_Oly_26.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3300003.JPG",
-          "date": "2001-03-30T14:38:52.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_02.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3300005.JPG",
-          "date": "2001-03-30T14:39:29.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_02.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3310013.JPG",
-          "date": "2001-03-31T17:02:20.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_03.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3300007.JPG",
-          "date": "2001-03-30T14:40:31.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_07.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3310014.JPG",
-          "date": "2001-03-31T17:17:51.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_09.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3300009.JPG",
-          "date": "2001-03-30T14:40:52.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_14.tif"
         },
         {
-          "file": "d:\\Complete\\3_01\\P3300010.JPG",
-          "date": "2001-03-30T14:41:14.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_15.tif"
         },
         {
-          "file": "d:\\Complete\\Hawaii_01\\P6160015.JPG",
-          "date": "2001-06-17T04:43:07.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_16.tif"
         },
         {
-          "file": "d:\\Complete\\Hawaii_01\\P6190014.JPG",
-          "date": "2001-06-20T03:43:01.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_17.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\P9300003.JPG",
-          "date": "2001-09-30T17:36:29.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_21.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PA050006.JPG",
-          "date": "2001-10-06T01:12:12.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_22.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PA050008.JPG",
-          "date": "2001-10-06T01:17:01.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_Rachel_BDay_23.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PA310010.JPG",
-          "date": "2001-11-01T00:59:17.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_07.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PA310011.JPG",
-          "date": "2001-11-01T00:59:42.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_08.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PA310013.JPG",
-          "date": "2001-11-01T01:01:36.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_25.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PA310014.JPG",
-          "date": "2001-11-01T01:02:52.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_26.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB030015.JPG",
-          "date": "2001-11-03T17:20:11.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_00.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB030016.JPG",
-          "date": "2001-11-03T17:20:19.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_05.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB030017.JPG",
-          "date": "2001-11-03T17:21:42.000Z"
+          "file": "d:\\PhotoArchives\\Mar_98_01_23.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB030019.JPG",
-          "date": "2001-11-03T18:08:30.000Z"
+          "file": "d:\\Special\\JoelHat.TIF"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB040005.JPG",
-          "date": "2001-11-05T01:20:19.000Z"
+          "file": "d:\\Special\\SamYosemite.TIF"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB040006.JPG",
-          "date": "2001-11-05T01:20:45.000Z"
+          "file": "d:\\Bad Photos\\Dec_99_1\\Dcp_0714.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB040007.JPG",
-          "date": "2001-11-05T01:23:22.000Z"
+          "file": "d:\\Bad Photos\\Dec_99_1\\Dcp_0717.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB040008.JPG",
-          "date": "2001-11-05T01:23:33.000Z"
+          "file": "d:\\Complete\\1_98\\0.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB040009.JPG",
-          "date": "2001-11-05T01:23:56.000Z"
+          "file": "d:\\Complete\\1_98\\10.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB030018.JPG",
-          "date": "2001-11-03T17:21:54.000Z"
+          "file": "d:\\Complete\\1_98\\11.tif"
         },
         {
-          "file": "d:\\Complete\\11_01\\PB040010.JPG",
-          "date": "2001-11-05T01:24:34.000Z"
+          "file": "d:\\Complete\\1_98\\12.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\14.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\15.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\16.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\17.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\18.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\21.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\22.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\24.tif"
+        },
+        {
+          "file": "d:\\Complete\\1_98\\9.tif"
+        },
+        {
+          "file": "d:\\Complete\\Canada\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Canada\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Canada\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Canada\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Canada\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Canada\\AGF00016.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_98\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_98\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_98\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_98\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_98\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_1\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_1\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_1\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_1\\AGF00008.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_1\\AGF00009.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_1\\AGF00010.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_2\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_2\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_2\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_2\\HolidayGreeting.TIF"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_2\\NewestHolidayGreeting.TIF"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_2\\NewHolidayGreeting.TIF"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_3\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_3\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_3\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_3\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Dec_99_3\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jul_99\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jul_99\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jul_99\\Agf00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jul_99\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jul_99\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jul_99\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jun_99\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jun_99\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jun_99\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jun_99\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jun_99\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Jun_99\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_98\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_98\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_98\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_98\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_98\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_1\\AGF00008.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00008.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00009.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00011.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00012.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00013.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00014.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_2\\AGF00015.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00008.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00009.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00010.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00011.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00012.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\AGF00013.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_3\\Agf00014.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00009.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00010.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00011.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00012.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00014.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00015.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00017.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00018.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\Agf00019.tif"
+        },
+        {
+          "file": "d:\\Complete\\Nov_99_4\\NewAgf00011.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_98\\00.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_98\\01.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_98\\04.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_98\\05.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_98\\17.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_1\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_1\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_1\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_1\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_1\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_1\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_2\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_2\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_2\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_2\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_2\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_2\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_3\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_3\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_3\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_3\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_3\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_3\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00006.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00010.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00011.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_4\\AGF00012.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\Agf00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\Agf00009.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\Agf00010.tif"
+        },
+        {
+          "file": "d:\\Complete\\OCT_99_5\\Agf00011.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_6\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_6\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_6\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_6\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_7\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Oct_99_7\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00001.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00002.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00003.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00004.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00005.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00007.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00008.tif"
+        },
+        {
+          "file": "d:\\Complete\\Sep_99\\AGF00009.tif"
         }
       ],
       "errorOther": []
