@@ -43,7 +43,7 @@ const googlePhotoAlbums=[
 const photoFileExtensions=[
   'jpg',
   'png',
-  'psd',
+  // 'psd',
   'tif',
   'tiff'
 ];
@@ -300,11 +300,12 @@ function findFile(photoFile) {
 
   let searchResult = {};
   searchResult.file = photoFile;
+  
 
   return new Promise( (resolve, reject) => {
     try {
       new exifImage({ image : photoFile }, function (error, exifData) {
-        if (error) {
+        if (error || !exifData || !exifData.exif || !exifData.exif.CreateDate) {
           searchResult.success = false;
           searchResult.reason = "noExif";
           searchResult.error = error;
@@ -339,12 +340,12 @@ function findFile(photoFile) {
 function saveSearchResults(searchResults) {
 
   // must use async version if file doesn't exist
-  // const existingResultsStr = fs.readFileSync('searchResults.json');
-  // let allResults = JSON.parse(existingResultsStr);
-
+  const existingResultsStr = fs.readFileSync('searchResults.json');
+  let allResults = JSON.parse(existingResultsStr);
+  
   // first time initialization
-  let allResults = {};
-  allResults.Volumes = {};
+  // let allResults = {};
+  // allResults.Volumes = {};
 
   // build results based on this search
   let volumeResults = {};
