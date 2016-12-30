@@ -1,3 +1,11 @@
+// UTC issue
+// exif data in google photos - exif timestamp is a local time, but is interpreted in the system as a UTC time,
+// while the exif data on the file on the drive is a proper time - when a Date object is created, it shows a UTC time,
+// which is 'n' hours later than the google photos time.
+
+// in google photos, date created from exif timestamp is the local time; date created from timestamp is better.
+
+
 // http://stackoverflow.com/questions/30179571/are-there-bookmarks-in-visual-studio-code
 // https://marketplace.visualstudio.com/items?itemName=alefragnani.Bookmarks
 // Ctrl-Alt K - toggle bookmarks
@@ -15,21 +23,21 @@ const https = require('https');
 
 const app = express();
 const googlePhotoAlbums=[
-  'Year2016', 
-  'Year2015',
-  'Year2014',
-  'Year2013',
-  'Year2012',
-  'Year2008',
-  'Year2007',
-  'Year2006',
-  'Year2005',
-  'Year2004',
-  'Year2003',
+  // 'Year2016', 
+  // 'Year2015',
+  // 'Year2014',
+  // 'Year2013',
+  // 'Year2012',
+  // 'Year2008',
+  // 'Year2007',
+  // 'Year2006',
+  // 'Year2005',
+  // 'Year2004',
+  // 'Year2003',
   'Year2002',
   'Year2001',
   'Year2000',
-  'YearPre2000'
+  // 'YearPre2000'
   ];
 
 const photoFileExtensions=[
@@ -127,6 +135,10 @@ function parseGooglePhoto(photo) {
     exifDateTime = new Date();
     ts = Number(timestamp);
     exifDateTime.setTime(ts);
+    // 2001:02:18 09:14:11
+    if (exifDateTime.getFullYear() === 2001 && exifDateTime.getMonth() === 1 && exifDateTime.getDate() === 18) {
+      // debugger;
+    }
   }
 
   timestamp = photo['gphoto:timestamp'][0];
@@ -265,7 +277,7 @@ function readGooglePhotoFiles(path) {
   let photosByKey = {};
   let photosByExifDateTime = {};
 
-function buildPhotoDictionaries(existingGooglePhotos) {
+function buildPhotoDictionaries() {
 
   photosByKey = {};
   photosByExifDateTime = {};
@@ -296,6 +308,7 @@ function buildPhotoDictionaries(existingGooglePhotos) {
 let photosFound;
 let photosFoundIndex;
 let photosFoundWithExifDateTime;
+let photosNotFound;
 
 function findFile(photosByExifDateTime) {
 
@@ -305,34 +318,38 @@ function findFile(photosByExifDateTime) {
       new exifImage({ image : photoFile }, function (error, exifData) {
           if (error) {
               console.log("num photos found: ", photosFoundWithExifDateTime);
+              console.log("num photos not found: ", photosNotFound);
               console.log('Error: '+error.message);
+              photosNotFound++;
               photosFoundIndex++;
               if (photosFoundIndex >= photosFound.length) {
                 console.log("photo search complete");
                 console.log("num photos found: ", photosFoundWithExifDateTime);
+                console.log("num photos not found: ", photosNotFound);
                 return;
               }
               findFile(photosByExifDateTime);
           }
           else {
               // console.log(exifData); // Do something with your data! 
-              const exifDateTimeStr = exifData.exif.CreateDate;
-              const year = Number(exifDateTimeStr.substring(0, 4));
-              const month = Number(exifDateTimeStr.substring(5, 7)) - 1;
-              let day = Number(exifDateTimeStr.substring(8, 10));
-              let hours = Number(exifDateTimeStr.substring(11, 13));
-              const minutes = Number(exifDateTimeStr.substring(14, 16));
-              const seconds = Number(exifDateTimeStr.substring(17, 19));
+              const dateTimeStr = exifData.exif.CreateDate;
+              const year = Number(dateTimeStr.substring(0, 4));
+              const month = Number(dateTimeStr.substring(5, 7)) - 1;
+              let day = Number(dateTimeStr.substring(8, 10));
+              let hours = Number(dateTimeStr.substring(11, 13));
+              const minutes = Number(dateTimeStr.substring(14, 16));
+              const seconds = Number(dateTimeStr.substring(17, 19));
 
               // BAD HACK THERE IS CAUSING PROBLEMS - UTC VS. LOCAL TIME
-              hours = hours - 8;
+              hours = hours - 0;
               if (hours < 0) {
-                console.log("skip: ", exifDateTimeStr);
+                console.log("skip: ", dateTimeStr);
                 // console.log("fail blog", day, ' ', hours);;
                 // console.log(hours);
                 // console.log(day);
                 // day = day - 1;
                 // hours = hours + 24;
+                photosNotFound++;
               }
               else {
                 const exifDateTime = new Date(year, month, day, hours, minutes, seconds);
@@ -342,13 +359,16 @@ function findFile(photosByExifDateTime) {
                   photosFoundWithExifDateTime++;
                 }
                 else {
-                  console.log("photo not found with exif date/time: ", isoString);
+                  console.log(photoFile + ' match not found. Exif date/time: ', isoString);
+                  // console.log("photo not found with exif date/time: ", isoString);
+                  photosNotFound++;
                 }
               }
               photosFoundIndex++;
               if (photosFoundIndex >= photosFound.length) {
                 console.log("photo search complete");
                 console.log("num photos found: ", photosFoundWithExifDateTime);
+                console.log("num photos not found: ", photosNotFound);
                 return;
               }
               findFile(photosByExifDateTime);
@@ -356,21 +376,24 @@ function findFile(photosByExifDateTime) {
       });
   } catch (error) {
     console.log("num photos found: ", photosFoundWithExifDateTime);
+    console.log("num photos not found: ", photosNotFound);
     console.log('Error: '+error.message);
     photosFoundIndex++;
     if (photosFoundIndex >= photosFound.length) {
       console.log("photo search complete");
       console.log("num photos found: ", photosFoundWithExifDateTime);
+      console.log("num photos not found: ", photosNotFound);
       return;
     }
     findFile(photosByExifDateTime);
   }
 }
 
-function findMissingFiles(existingGooglePhotos) {
+function findMissingFiles() {
 
-  const photoDictionaries = buildPhotoDictionaries(existingGooglePhotos);
+  // const photoDictionaries = buildPhotoDictionaries();
   // let { photosByKey, photosByExifDateTime } = photoDictionaries;
+  buildPhotoDictionaries();
   console.log(Object.keys(photosByKey).length);
   console.log(Object.keys(photosByExifDateTime).length);
 
@@ -384,51 +407,21 @@ function findMissingFiles(existingGooglePhotos) {
     photosFoundIndex = 0;
     photosFound = files;
     photosFoundWithExifDateTime = 0;
+    photosNotFound = 0;
     findFile(photosByExifDateTime);
-
-    // let photoFile = files[0];
-    // console.log(photoFile);
-
-    // try {
-    //     new exifImage({ image : photoFile }, function (error, exifData) {
-    //         if (error)
-    //             console.log('Error: '+error.message);
-    //         else {
-    //             console.log(exifData); // Do something with your data! 
-    //             const exifDateTimeStr = exifData.exif.CreateDate;
-    //             const year = Number(exifDateTimeStr.substring(0, 4));
-    //             const month = Number(exifDateTimeStr.substring(5, 7)) - 1;
-    //             const day = Number(exifDateTimeStr.substring(8, 10));
-    //             const hours = Number(exifDateTimeStr.substring(11, 13));
-    //             const minutes = Number(exifDateTimeStr.substring(14, 16));
-    //             const seconds = Number(exifDateTimeStr.substring(17, 19));
-    //             const exifDateTime = new Date(year, month, day, hours, minutes, seconds);
-
-    //             console.log(photoFile);
-    //             console.log(exifDateTime);
-
-    //             debugger;
-    //         }
-    //     });
-    // } catch (error) {
-    //     console.log('Error: ' + error.message);
-    // }
-
-    // files.forEach( (file) => {
-    //   try {
-    //       new exifImage({ image : file }, function (error, exifData) {
-    //           if (error)
-    //               console.log('Error: '+error.message);
-    //           else
-    //               console.log(exifData); // Do something with your data! 
-    //       });
-    //   } catch (error) {
-    //       console.log('Error: ' + error.message);
-    //   }
-    // });
   });
 }
 
+function getDateFromString(dateTimeStr) {
+  const year = Number(dateTimeStr.substring(0, 4));
+  const month = Number(dateTimeStr.substring(5, 7)) - 1;
+  const day = Number(dateTimeStr.substring(8, 10));
+  const hours = Number(dateTimeStr.substring(11, 13));
+  const minutes = Number(dateTimeStr.substring(14, 16));
+  const seconds = Number(dateTimeStr.substring(17, 19));
+  const dateTime = new Date(year, month, day, hours, minutes, seconds);
+  return dateTime;
+}
 
 // debugger;
 // const exifDateTimeStr = "2001:02:18 09:14:11";
@@ -436,14 +429,10 @@ function findMissingFiles(existingGooglePhotos) {
 // const month = Number(exifDateTimeStr.substring(5, 7)) - 1;
 // const day = Number(exifDateTimeStr.substring(8, 10));
 // let hours = Number(exifDateTimeStr.substring(11, 13));
-// hours = hours - 8;
+// // // hours = hours - 8;
 // const minutes = Number(exifDateTimeStr.substring(14, 16));
 // const seconds = Number(exifDateTimeStr.substring(17, 19));
 // const exifDateTime = new Date(year, month, day, hours, minutes, seconds);
-
-
-
-
 
 let existingGooglePhotos = [];
 let existingPhotosSpec;
@@ -461,7 +450,19 @@ promise.then(() => {
   existingGooglePhotos = existingPhotosSpec.photos;
   console.log("Number of existing google photos: ", existingGooglePhotos.length);
 
-  findMissingFiles(existingGooglePhotos);
+// "2001-02-18T17:14:11.000Z"
+// "2001-02-18T09:14:11.000Z"
+  existingGooglePhotos.forEach( (photo, index) => {
+    if (photo.exifDateTime !== '') {
+      // if (photo.exifDateTime === "2001-02-18T09:14:11.000Z") {
+      //   debugger;
+      // }  
+      // photo.exifDateTime = getDateFromString(photo.dateTime);
+      photo.exifDateTime = photo.dateTime;
+    }
+  });
+
+  findMissingFiles();
 
 }, (reason) => {
   console.log('Error reading allGooglePhotos.json: ');
