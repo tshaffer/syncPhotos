@@ -299,18 +299,73 @@ let photosFoundIndex;
 let photosFoundWithExifDateTime;
 let photosNotFound;
 
-function findFile(photosByExifDateTime) {
+function photoMatchingComplete() {
+    console.log("photo search complete");
+    // console.log("num photos found: ", photosFoundWithExifDateTime);
+    // console.log("num photos not found: ", photosNotFound);
+    console.log("photosFoundIndex: ", photosFoundIndex);
+    console.log("total number of photos: ", photosFound.length);
+    debugger;
+}
+
+function newFindFile(photoFile) {
+
+  let searchResult = {};
+  searchResult.file = photoFile;
+
+  return new Promise( (resolve, reject) => {
+    try {
+      new exifImage({ image : photoFile }, function (error, exifData) {
+        if (error) {
+          searchResult.success = false;
+          searchResult.reason = "noExif";
+          searchResult.error = error;
+          resolve(searchResult);
+        }
+        else {
+          const dateTimeStr = exifData.exif.CreateDate;
+          const exifDateTime = getDateFromString(dateTimeStr);
+          const isoString = exifDateTime.toISOString();
+          searchResult.isoString = isoString;
+          // console.log("isoString: ", isoString);
+          if (photosByExifDateTime[isoString]) {
+            photosFoundWithExifDateTime++;
+            searchResult.success = true;
+          }
+          else {
+            // console.log(photoFile + ' match not found. Exif date/time: ', isoString);
+            searchResult.success = false;
+            searchResult.reason = "noMatch";
+          }
+          resolve(searchResult);
+        }
+      });
+    } catch (error) {
+      searchResult.success = false;
+      searchResult.error = error;
+      resolve(searchResult);
+    }
+  });
+}
+
+function findFile() {
 
     const photoFile = photosFound[photosFoundIndex];
+    if (photosFoundIndex >= photosFound.length) {
+      debugger;
+    }
+
     try {
       new exifImage({ image : photoFile }, function (error, exifData) {
         if (error) {
           photosNotFound++;
           photosFoundIndex++;
           if (photosFoundIndex >= photosFound.length) {
-            return;
+            photoMatchingComplete();
           }
-          findFile(photosByExifDateTime);
+          else {
+            findFile();
+          }
         }
         else {
           const dateTimeStr = exifData.exif.CreateDate;
@@ -327,16 +382,20 @@ function findFile(photosByExifDateTime) {
         }
         photosFoundIndex++;
         if (photosFoundIndex >= photosFound.length) {
-          return;
+            photoMatchingComplete();
         }
-        findFile(photosByExifDateTime);
+        else {
+          findFile();
+        }
       });
     } catch (error) {
       photosFoundIndex++;
       if (photosFoundIndex >= photosFound.length) {
-        return;
+            photoMatchingComplete();
       }
-      findFile(photosByExifDateTime);
+      else {
+        findFile();
+      }
     }
 }
 
@@ -352,10 +411,26 @@ function findMissingFiles() {
     photosFound = files;
     photosFoundWithExifDateTime = 0;
     photosNotFound = 0;
-    findFile(photosByExifDateTime);
-    console.log("photo search complete");
-    console.log("num photos found: ", photosFoundWithExifDateTime);
-    console.log("num photos not found: ", photosNotFound);
+
+    console.log("total number of photos on drive: ", photosFound.length);
+
+    // findFile();
+    let promises = [];
+    files.forEach( (file) => {
+      promise = newFindFile(file);
+      promises.push(promise);
+    });
+    Promise.all(promises).then( (searchResults) => {
+      let numMatchesFound = 0;
+      searchResults.forEach( (result) => {
+        if (result.success) {
+          numMatchesFound++;
+        }
+      });
+      console.log("Number of matches found: ", numMatchesFound);
+
+      debugger;
+    });
   });
 }
 
