@@ -23,6 +23,9 @@ const axios = require('axios');
 const https = require('https');
 
 const app = express();
+
+const utils = require('./utils');
+
 const googlePhotoAlbums=[
   'Year2016', 
   'Year2015',
@@ -41,17 +44,9 @@ const googlePhotoAlbums=[
   'YearPre2000'
   ];
 
-const photoFileExtensions=[
-  'jpg',
-  'png',
-  // 'psd',
-  'tif',
-  'tiff'
-];
-
 // initialize 'global' variables
 // review which of these need to be 'global'
-const fetchingGooglePhotos = false;
+const fetchingGooglePhotos = true;
 let photosById = {};                      // unclear if this is really used
 let photosByKey = {};
 let photosByExifDateTime = {};
@@ -168,35 +163,6 @@ function parseGooglePhoto(photo) {
   };
 }
 
-function getFileExtension(fileName) {
-  return fileName.split('.').pop();
-}
-
-function isJpegFile(fileName) {
-  const ext = getFileExtension(fileName.toLowerCase());
-  if ( (['jpg'].indexOf(ext)) >= 0) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
-function isPhotoFile(fileName) {
-  const ext = getFileExtension(fileName.toLowerCase());
-  if ( (photoFileExtensions.indexOf(ext)) >= 0) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
-function isPhoto(photo) {
-  const fileName = photo.title[0]._;
-  return isPhotoFile(fileName);
-}
-
 function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
 
   return new Promise( (resolve, reject) => {
@@ -220,10 +186,14 @@ function fetchPhotosFromAlbums(googlePhotoAlbumIds) {
           // check to see if photo has already been retrieved
           const photoId = googlePhoto["gphoto:id"][0];
           if (!photosById[photoId]) {
-            if (isPhoto(googlePhoto)) {
+            if (utils.isPhoto(googlePhoto)) {
               const photo = parseGooglePhoto(googlePhoto);
               allPhotos.push(photo);
             }
+          }
+          else {
+            console.log("*************************** DUPLICATE GOOGLE ID FOUND ***********************");
+            debugger;
           }
         });
       });
@@ -347,7 +317,7 @@ function findFile(photoFile) {
         if (error || !exifData || !exifData.exif || (!exifData.exif.CreateDate && !exifData.exif.DateTimeOriginal)) {
 
           // no exif date - search in photosByKey if it's a jpeg file
-          if (isJpegFile(photoFile)) {
+          if (utils.isJpegFile(photoFile)) {
             searchResult = findPhotoByKey(photoFile);
           }
           else {
@@ -363,13 +333,13 @@ function findFile(photoFile) {
           else {
             dateTimeStr = exifData.exif.DateTimeOriginal;
           }
-          const exifDateTime = getDateFromString(dateTimeStr);
+          const exifDateTime = utils.getDateFromString(dateTimeStr);
           const isoString = exifDateTime.toISOString();
           if (photosByExifDateTime[isoString]) {
             searchResult = setSearchResult(photoFile, true, 'exifMatch', '');
           }
           else {
-            if (isJpegFile(photoFile)) {
+            if (utils.isJpegFile(photoFile)) {
               searchResult = findPhotoByKey(photoFile);
             }
             else {
@@ -485,7 +455,7 @@ function findMissingFiles() {
 
   nodeDir.files("d:/", (err, files) => {
     if (err) throw err;
-    files = files.filter(isPhotoFile);
+    files = files.filter(utils.isPhotoFile);
 
     console.log("Photos on drive: ", files.length);
 
@@ -499,18 +469,6 @@ function findMissingFiles() {
     });
   });
 }
-
-function getDateFromString(dateTimeStr) {
-  const year = Number(dateTimeStr.substring(0, 4));
-  const month = Number(dateTimeStr.substring(5, 7)) - 1;
-  const day = Number(dateTimeStr.substring(8, 10));
-  const hours = Number(dateTimeStr.substring(11, 13));
-  const minutes = Number(dateTimeStr.substring(14, 16));
-  const seconds = Number(dateTimeStr.substring(17, 19));
-  const dateTime = new Date(year, month, day, hours, minutes, seconds);
-  return dateTime;
-}
-
 
 function runFetchGooglePhotos() {
 
@@ -557,8 +515,6 @@ function matchFiles() {
   });
 }
 
-
-
 // Program start
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
@@ -568,29 +524,30 @@ console.log("__dirname: ", __dirname);
 //   debugger;
 // });
 
-
-
 // volumeName = "Photos5";
 // matchFiles();
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
-rl.question('Enter the volume name: ', (vName) => {
 
-  rl.close();
+if (fetchingGooglePhotos) {
+  runFetchGooglePhotos();
+}
+else {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
-  console.log("volumeName is: ", vName);
+  rl.question('Enter the volume name: ', (vName) => {
 
-  volumeName = vName;
+    rl.close();
 
-  matchFiles();
+    console.log("volumeName is: ", vName);
 
-  if (fetchingGooglePhotos) {
-    runFetchGooglePhotos();
-  }
-});
+    volumeName = vName;
+
+    matchFiles();
+  });
+}
 
 
