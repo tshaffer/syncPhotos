@@ -324,7 +324,6 @@ function findPhotoByKey(photoFile) {
   try {
     const rawImageData = jpegJS.decode(jpegData);
     const key = (name + '-' + rawImageData.width.toString() + rawImageData.height.toString()).toLowerCase();
-    console.log('key: ', key);
     if (photosByKey[key]) {
       return setSearchResult(photoFile, true, 'keyMatch', '');
     }
@@ -332,7 +331,6 @@ function findPhotoByKey(photoFile) {
       return setSearchResult(photoFile, false, 'noKeyMatch', '');
     }
   } catch (jpegJSError) {
-    console.log('jpegJSError: ', photoFile);
     return setSearchResult(photoFile, false, 'jpegJSError', jpegJSError);
   };
 }
@@ -363,15 +361,8 @@ function findFile(photoFile) {
             searchResult = setSearchResult(true, 'exifMatch', '');
           }
           else {
-            // searchResult = setSearchResult(false, 'noExifMatch', '');
             if (isJpegFile(photoFile)) {
-              // console.log('isoString: ', isoString);
-              // console.log('invoke findPhotoByKey on: ', photoFile);
               searchResult = findPhotoByKey(photoFile);
-              // console.log(searchResult);
-              // if (!searchResult.success) {
-              //   debugger;
-              // }
             }
             else {
               searchResult = setSearchResult(false, 'noExifMatch', '');
@@ -390,14 +381,14 @@ function findFile(photoFile) {
 
 function saveSearchResults(searchResults) {
 
-  // must use async version if file read failure is possible
-  // const existingResultsStr = fs.readFileSync('searchResults.json');
-  // let allResults = JSON.parse(existingResultsStr);
-  
   // first time initialization
-  let allResults = {};
-  allResults.Volumes = {};
+  // let allResults = {};
+  // allResults.Volumes = {};
 
+  // must use async version if file read failure is possible
+  const existingResultsStr = fs.readFileSync('searchResults.json');
+  let allResults = JSON.parse(existingResultsStr);
+  
   // build results based on this search
   let volumeResults = {};
   volumeResults.noKeyMatch = [];
@@ -430,24 +421,24 @@ function saveSearchResults(searchResults) {
       case 'keyMatch':
         numKeyMatches++;
         break;
-      case 'noKeyMatch':
-        volumeResults.noKeyMatch.push({file: searchResult.file});
-        numNoKeyMatches++;
-        break;
       case 'noExifMatch':
-        volumeResults.noExifMatch.push({file: searchResult.file});
+        volumeResults.noExifMatch.push({file: searchResult.photoFile});
         numNoExifMatches++;
         break;
+      case 'noKeyMatch':
+        volumeResults.noKeyMatch.push({file: searchResult.photoFile});
+        numNoKeyMatches++;
+        break;
       case 'noExifNotJpg':
-        volumeResults.noExifNotJpg.push({file: searchResult.file});
+        volumeResults.noExifNotJpg.push({file: searchResult.photoFile});
         numNoExifNotJpgs++;
         break;
       case 'jpegJSError':
-        volumeResults.errorOther.push({file: searchResult.file});
+        volumeResults.errorOther.push({file: searchResult.photoFile});
         numJpegJsErrors++;
         break;
       case 'other':
-        volumeResults.errorOther.push({file: searchResult.file});
+        volumeResults.errorOther.push({file: searchResult.photoFile});
         numOthers++;
         break;
     }
@@ -557,28 +548,27 @@ function matchFiles() {
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
 
-  volumeName = "Photos5";
+// volumeName = "Photos5";
+// matchFiles();
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+rl.question('Enter the volume name: ', (vName) => {
+
+  rl.close();
+
+  console.log("volumeName is: ", vName);
+
+  volumeName = vName;
 
   matchFiles();
 
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// });
-
-// rl.question('Enter the volume name: ', (vName) => {
-
-//   rl.close();
-
-//   console.log("volumeName is: ", vName);
-
-//   volumeName = vName;
-
-//   matchFiles();
-
-//   if (fetchingGooglePhotos) {
-//     runFetchGooglePhotos();
-//   }
-// });
+  if (fetchingGooglePhotos) {
+    runFetchGooglePhotos();
+  }
+});
 
 
