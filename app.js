@@ -46,10 +46,11 @@ const googlePhotoAlbums=[
 
 // initialize 'global' variables
 // review which of these need to be 'global'
-const fetchingGooglePhotos = true;
+const fetchingGooglePhotos = false;
 let photosById = {};                      // unclear if this is really used
 let photosByKey = {};
 let photosByExifDateTime = {};
+let photosByName = {};
 let existingGooglePhotos = [];
 let existingPhotosSpec;
 let volumeName = "unknown";
@@ -258,15 +259,18 @@ function buildPhotoDictionaries() {
 
   photosByKey = {};
   photosByExifDateTime = {};
+  photosByName = {};
 
   let numDuplicates = 0;
   existingGooglePhotos.forEach( (photo) => {
+
+    const name = photo.name;
 
     if (photo.exifDateTime && photo.exifDateTime !== '') {
       photosByExifDateTime[photo.exifDateTime] = photo;
     }
 
-    const key = (photo.name + '-' + photo.width + photo.height).toLowerCase();
+    const key = (name + '-' + photo.width + photo.height).toLowerCase();
     if (photosByKey[key]) {
       numDuplicates++;
     }
@@ -274,10 +278,20 @@ function buildPhotoDictionaries() {
       photosByKey[key] = photo;
     }
 
+    if (photosByName[name]) {
+      photosByName[name].photoList.push(photo);
+
+    }
+    else {
+      photosByName[name] = {};
+      photosByName[name].photoList = [photo];
+    }
   });
 
   fs.writeFileSync('photosByExifDateTime.json', JSON.stringify(photosByExifDateTime, null, 2));
   fs.writeFileSync('photosByKey.json', JSON.stringify(photosByKey, null, 2));
+  fs.writeFileSync('photosByName.json', JSON.stringify(photosByName, null, 2));
+  debugger;
 }
 
 function setSearchResult(photoFile, success, reason, error) {
