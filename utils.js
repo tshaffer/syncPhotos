@@ -48,6 +48,7 @@ function getDateFromString(dateTimeStr) {
 
 module.exports = {
   getFileExtension,
+  isJpegFile,
   isPhotoFile,
   isPhoto,
   getDateFromString

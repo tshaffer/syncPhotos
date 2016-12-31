@@ -14,6 +14,7 @@
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
+var readlineSync = require('readline-sync');
 const nodeDir = require('node-dir');
 const exifImage = require('exif').ExifImage;
 const jpegJS = require('jpeg-js');
@@ -54,6 +55,7 @@ let photosByName = {};
 let existingGooglePhotos = [];
 let existingPhotosSpec;
 let volumeName = "unknown";
+let rl = null;
 
 // return a list of albumIds for the albums referenced above
 function parseAlbums(albums) {
@@ -240,21 +242,6 @@ function readGooglePhotoFiles(path) {
 }
 
 
-// http://stackoverflow.com/questions/36094026/unable-to-read-from-console-in-node-js-using-vs-code
-// https://code.visualstudio.com/Docs/editor/debugging
-
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// });
-
-// rl.question('What do you think of Node.js? ', (answer) => {
-//   // TODO: Log the answer in a database
-//   console.log(`Thank you for your valuable feedback: ${answer}`);
-
-//   rl.close();
-// });
-
 function buildPhotoDictionaries() {
 
   photosByKey = {};
@@ -291,15 +278,24 @@ function buildPhotoDictionaries() {
   fs.writeFileSync('photosByExifDateTime.json', JSON.stringify(photosByExifDateTime, null, 2));
   fs.writeFileSync('photosByKey.json', JSON.stringify(photosByKey, null, 2));
   fs.writeFileSync('photosByName.json', JSON.stringify(photosByName, null, 2));
-  debugger;
 }
 
 function setSearchResult(photoFile, success, reason, error) {
+
+  let photoList = null;
+  if (!success) {
+    const photoFiles = findPhotoByName(photoFile);
+    if (photoFiles) {
+      photoList = photoFiles;                
+    }
+  }
+
   return {
     photoFile,
     success,
     reason,
-    error
+    error,
+    photoList
   };
 }
 
@@ -318,6 +314,20 @@ function findPhotoByKey(photoFile) {
   } catch (jpegJSError) {
     return setSearchResult(photoFile, false, 'jpegJSError', jpegJSError);
   };
+}
+
+function findPhotoByName(photoFile) {
+
+  const fileName = path.basename(photoFile);
+
+  if (photosByName[fileName]) {
+    let photoFiles = {
+      photoFile,
+      photoList: photosByName[fileName].photoList
+    };
+    return photoFiles;
+  }
+  return false;
 }
 
 function findFile(photoFile) {
@@ -378,6 +388,32 @@ function findFile(photoFile) {
   });
 }
 
+function resolvePhotoLists(searchResults) {
+  searchResults.forEach( (searchResult) => {
+    if (searchResult.photoList) {
+      console.log('');
+      console.log('No match found for:');
+      console.log(searchResult.photoFile);
+      console.log("Possible matches include:");
+      // console.log(searchResult.photoList.photoList);
+      searchResult.photoList.photoList.forEach( (photo) => {
+        console.log(photo);
+      });
+      // rl.question("Enter 'y' if one of them is a match, 'n' if none of them is a match: ", (answer) => {
+      //   if (answer === 'y') {
+      //     searchResult.success = true;
+      //   }
+      // });
+
+      if (readlineSync.keyInYN("Enter 'y' if one of them is a match, 'n' if none of them is a match.")) {
+        searchResult.success = true;
+      }    
+    }
+  });
+
+  // rl.close();
+}
+
 function saveSearchResults(searchResults) {
 
   // first time initialization
@@ -397,6 +433,8 @@ function saveSearchResults(searchResults) {
 
   let numMatchesFound = 0;
 
+  let numWithPhotoList = 0;
+
   let numExifMatches = 0;
   let numKeyMatches = 0;
 
@@ -407,10 +445,15 @@ function saveSearchResults(searchResults) {
   let numJpegJsErrors = 0;
   let numOthers = 0;
   
+  resolvePhotoLists(searchResults);
+
   searchResults.forEach( (searchResult) => {
 
     if (searchResult.success) {
       numMatchesFound++;
+    }
+    else if (searchResult.photoList) {
+      numWithPhotoList++;
     }
     
     switch(searchResult.reason) {
@@ -444,6 +487,7 @@ function saveSearchResults(searchResults) {
   });
 
   console.log('Total number of matches: ', numMatchesFound);
+  console.log('Number of potential matches: ', numWithPhotoList);
   console.log('numExifMatches', numExifMatches);
   console.log('numKeyMatches:', numKeyMatches);
   console.log('numNoExifMatches', numNoExifMatches);
@@ -456,7 +500,7 @@ function saveSearchResults(searchResults) {
   allResults.lastUpdated = new Date().toLocaleDateString();
   allResults.Volumes[volumeName] = volumeResults;
 
-  // // store search results in a file
+  // store search results in a file
   const allResultsStr = JSON.stringify(allResults, null, 2);
   fs.writeFileSync('searchResults.json', allResultsStr);
 
@@ -547,14 +591,14 @@ if (fetchingGooglePhotos) {
   runFetchGooglePhotos();
 }
 else {
-  const rl = readline.createInterface({
+  rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
 
   rl.question('Enter the volume name: ', (vName) => {
 
-    rl.close();
+    // rl.close();
 
     console.log("volumeName is: ", vName);
 
