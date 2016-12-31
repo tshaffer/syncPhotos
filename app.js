@@ -306,7 +306,8 @@ function buildPhotoDictionaries() {
 
   });
 
-  // fs.writeFileSync('photosByKey.json', JSON.stringify(photosByKey, null, 2));
+  fs.writeFileSync('photosByExifDateTime.json', JSON.stringify(photosByExifDateTime, null, 2));
+  fs.writeFileSync('photosByKey.json', JSON.stringify(photosByKey, null, 2));
 }
 
 function setSearchResult(photoFile, success, reason, error) {
@@ -342,38 +343,52 @@ function findFile(photoFile) {
   return new Promise( (resolve, reject) => {
     try {
       new exifImage({ image : photoFile }, function (error, exifData) {
-        if (error || !exifData || !exifData.exif || !exifData.exif.CreateDate) {
+
+        if (error || !exifData || !exifData.exif || (!exifData.exif.CreateDate && !exifData.exif.DateTimeOriginal)) {
 
           // no exif date - search in photosByKey if it's a jpeg file
           if (isJpegFile(photoFile)) {
             searchResult = findPhotoByKey(photoFile);
           }
           else {
-            searchResult = setSearchResult(false, 'noExifNotJpg', error);
+            searchResult = setSearchResult(photoFile, false, 'noExifNotJpg', error);
           }
           resolve(searchResult);
         }
         else {
-          const dateTimeStr = exifData.exif.CreateDate;
+          let dateTimeStr = '';
+          if (exifData.exif.CreateDate) {
+            dateTimeStr = exifData.exif.CreateDate;
+          }
+          else {
+            dateTimeStr = exifData.exif.DateTimeOriginal;
+          }
           const exifDateTime = getDateFromString(dateTimeStr);
           const isoString = exifDateTime.toISOString();
           if (photosByExifDateTime[isoString]) {
-            searchResult = setSearchResult(true, 'exifMatch', '');
+            searchResult = setSearchResult(photoFile, true, 'exifMatch', '');
           }
           else {
             if (isJpegFile(photoFile)) {
               searchResult = findPhotoByKey(photoFile);
             }
             else {
-              searchResult = setSearchResult(false, 'noExifMatch', '');
+              searchResult = setSearchResult(photoFile, false, 'noExifMatch', '');
             }
           }
           searchResult.isoString = isoString;
+          if (!exifData.exif.CreateDate) {
+            console.log(photoFile);
+            console.log(exifDateTime);
+            console.log(isoString);
+            console.log(searchResult);
+            // debugger;
+          }
           resolve(searchResult);
         }
       });
     } catch (error) {
-      searchResult = setSearchResult(false, 'other', error);
+      searchResult = setSearchResult(photoFile, false, 'other', error);
       resolve(searchResult);
     }
   });
@@ -547,6 +562,13 @@ function matchFiles() {
 // Program start
 console.log("syncPhotos - start");
 console.log("__dirname: ", __dirname);
+
+// const photoFile = "D:\\9-1-2006\\My Pictures\\2006\\03_March_1\\_DSC4093.jpg";
+// new exifImage({ image : photoFile }, function (error, exifData) {
+//   debugger;
+// });
+
+
 
 // volumeName = "Photos5";
 // matchFiles();
